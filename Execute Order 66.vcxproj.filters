@@ -13,10 +13,62 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Libraries">
+      <UniqueIdentifier>{7e82a350-4659-4e64-be13-6756bbe7efdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Libraries\libparse">
+      <UniqueIdentifier>{f70159a9-26da-4fe6-a74b-24006e1c593d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Libraries">
+      <UniqueIdentifier>{e79ac69a-d5c3-4b6e-8ce6-4be97bfc5a55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Libraries\libparse">
+      <UniqueIdentifier>{40516504-edf2-40cd-a58f-de925f6d9a5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Blobs">
+      <UniqueIdentifier>{28d5f0e9-a62c-4e79-85d5-6c234e95c012}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
-      <Filter>Resource Files</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lib\libparse\libparse.c">
+      <Filter>Source Files\Libraries\libparse</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Coordinates.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\randomGenerators.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\babyblob.png">
+      <Filter>Resource Files\Blobs</Filter>
+    </Image>
+    <Image Include="res\goodoldblob.png">
+      <Filter>Resource Files\Blobs</Filter>
+    </Image>
+    <Image Include="res\grownblob.png">
+      <Filter>Resource Files\Blobs</Filter>
+    </Image>
+    <Image Include="res\background.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\food.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lib\libparse\libparse.h">
+      <Filter>Header Files\Libraries\libparse</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Coordinates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\randomGenerators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

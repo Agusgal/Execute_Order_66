@@ -19,7 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="lib\libparse\libparse.c" />
+    <ClCompile Include="src\Coordinates.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\randomGenerators.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\babyblob.png" />
+    <Image Include="res\background.jpg" />
+    <Image Include="res\food.png" />
+    <Image Include="res\goodoldblob.png" />
+    <Image Include="res\grownblob.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lib\libparse\libparse.h" />
+    <ClInclude Include="src\Coordinates.h" />
+    <ClInclude Include="src\randomGenerators.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
