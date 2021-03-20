@@ -8,7 +8,7 @@ public:
     double angle;
 
     Coordinates();
-    Coordinates(int maxX, int maxY);
+    Coordinates(unsigned int maxX, unsigned int maxY);
 
     void rotate(double angle);
     void update(double modulus);

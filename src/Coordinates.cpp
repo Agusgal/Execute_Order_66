@@ -12,21 +12,22 @@
 // Convert degree in radians
 #define DEG2RAD(d)      ((d)*(M_PI/180))
 
-
-/******************** NAMESPACES ********************/
-using namespace std;
-
 /******************** CONSTRUCTOR ********************/
 Coordinates::Coordinates() {
-    cout << "Coordinates() called" << endl;
+#ifdef DEBUG
+    std::cout << "Coordinates() called" << std::endl;
+#endif
+
     x = 0.0;
     y = 0.0;
     angle = 0.0;
  }
 
-Coordinates::Coordinates(int maxX, int maxY) {
-    cout << "Coordinates(int, int) called" << endl;
-    
+Coordinates::Coordinates(unsigned int maxX, unsigned int maxY) {
+#ifdef DEBUG
+    std::cout << "Coordinates(int, int) called" << std::endl;
+#endif
+
     x = generateRandomNumber(maxX);
     y = generateRandomNumber(maxY);
     angle = generateRandomAngle();
@@ -34,7 +35,9 @@ Coordinates::Coordinates(int maxX, int maxY) {
 
 /******************** PUBLIC METHODS ********************/
 void Coordinates::rotate(const double angle) {
-    cout << "Rotate: " << angle << endl;
+#ifdef DEBUG
+    std::cout << "Rotate: " << angle << std::endl;
+#endif
 
     // Angles that fall out of range (-360.0 ; 360.0) are taken back to this range
     if (isgreaterequal(fabs(angle), 360.0)) {
@@ -64,17 +67,18 @@ void Coordinates::rotate(const double angle) {
  }
 
 void Coordinates::update(double modulus) {
-    cout << "Update (" << modulus << ")" << endl;
-
+#ifdef DEBUG
+    std::cout << "Update (" << modulus << ")" << std::endl;
+#endif
 
     if (islessequal(modulus, 0.0)) {
-        cout << "Modulus must be greater than 0.0" << endl;
+        std::cout << "Modulus must be greater than 0.0" << std::endl;
         return;
     }
 
     // Fix bad angles
     if (isless(this->angle, 0.0) || isgreaterequal(this->angle, 360.0)) {
-        cout << "An invalid angle has been set. Fixing..." << endl;
+        std::cout << "An invalid angle has been set. Fixing..." << std::endl;
         rotate(0.0);
     }
 
