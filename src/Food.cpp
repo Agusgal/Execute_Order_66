@@ -49,13 +49,14 @@ void Food::updateAndGetPosition(double& newX, double& newY) {
 }
 
 const Point_t* Food::updateAndGetPosition(void) {
-    this->updateAndGetPosition();
+    this->generatePosition();
     return &(this->current);
 }
 
 /******************** PRIVATE METHODS ********************/
 void Food::generatePosition(void) {
-    this->current.x = generateRandomNumber(this->maximum.x);
-    this->current.y = generateRandomNumber(this->maximum.y);
+    // TODO: Handle floating point
+    this->current.x = generateRandomNumber((unsigned)this->maximum.x);
+    this->current.y = generateRandomNumber((unsigned)this->maximum.y);
     return;
 }
