@@ -28,30 +28,29 @@ public:
         double smellRadius[NBLOBS], double deathChance[NBLOBS]
     );
 
+    /* This is the blob speed.
+     * Modify it at will, it's not taken into account 
+     */
     double speed;
 
-    /*
-    void move(void);
-    void eat(void);
     void die(void);
+    /* Increment food counter and return if a new birdth should happen */
+    bool eat(void);
+    void grow(const double newAngle);
+    void move(const double modulus);
     void sayHi(void);
-    */
+
     double getDeadthChance(void);
     double getSmellRadius(void);
+    double getMaximumSpeed(void);
     
-    /*
     const Sprite* getBlobSprite(void);
     void getCoordinates(double& x, double& y, double& angle);
-    */
-
-    void printDeathChance(void);
-    void printCoordinates(void);
 
 private:
     unsigned age;
     double maximumSpeed;
     unsigned foodCount;
-
 
     double * deathChanceByAge;
     double * smellRadiusByAge;
@@ -59,9 +58,6 @@ private:
     Point_t maximumPosition;
     Coordinates currentPosition;
     Sprite * sprites;
-
-
-    //void blobBirthday(void);
 };
 
 #endif /* ! BLOB_H */

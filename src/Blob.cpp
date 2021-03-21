@@ -8,7 +8,7 @@
 
 /******************** MACROS ********************/
 /******************** CONSTRUCTOR ********************/
-Blob::Blob(Point_t& maxCoordinates, Sprite sprites[NBLOBS],
+Blob::Blob(Point_t& maxCoordinates, Sprite spritesArray[NBLOBS],
     double maxSpeed, 
     double smellRadius[NBLOBS],
     double deathChance[NBLOBS]) 
@@ -40,6 +40,10 @@ Blob::Blob(Point_t& maxCoordinates, Sprite sprites[NBLOBS],
     if (islessequal(maxSpeed, 0.0)) {
         std::cout << "Maximum speed must be greater than 0." << std::endl;
     }
+    else if (spritesArray == NULL) {
+        std::cout << "Recieved NULL pointer for sprites." << std::endl;
+        return;
+    }
 
     for (int i = BABYBLOB; i < NBLOBS; i++) {
         if (islessequal(deathChance[i], 0.0)) {
@@ -64,8 +68,103 @@ Blob::Blob(Point_t& maxCoordinates, Sprite sprites[NBLOBS],
 
     this->maximumSpeed = maxSpeed;
     this->maximumPosition = maxCoordinates;
+
+    this->sprites = spritesArray;
 }
 /******************** PUBLIC METHODS ********************/
+
+void Blob::die(void) {
+    this->speed = 0;
+    this->age = BABYBLOB;
+    this->maximumSpeed = 0;
+    this->foodCount = 0;
+    this->deathChanceByAge = NULL;
+    this->smellRadiusByAge = NULL;
+    this->maximumPosition.x = 0;
+    this->maximumPosition.y = 0;
+
+    return;
+}
+
+bool Blob::eat(void) {
+    bool newBirdth = false;
+
+    this->foodCount++;
+    switch (this->age) {
+        case BABYBLOB:
+            if (this->foodCount == FOOD_BABYBLOB) {
+                newBirdth = true;
+                foodCount = 0;
+            }
+            break;
+
+        case GROWNBLOB:
+            if (this->foodCount == FOOD_GROWNBLOB) {
+                newBirdth = true;
+                foodCount = 0;
+            }
+            break;
+
+        case GOODOLDBLOB:
+            if (this->foodCount == FOOD_GOODOLDBLOB) {
+                newBirdth = true;
+                foodCount = 0;
+            }
+            break;
+
+        default:
+            newBirdth = false;
+            break;
+    }
+
+    return newBirdth;
+}
+
+void Blob::grow(const double newAngle) {
+    if (isless(newAngle, 0.0) || isgreaterequal(newAngle, 360.0)) {
+        std::cout << "The Blob's new angle must be in range [0 ; 360.0)." 
+            << "\nRecieved: " << newAngle 
+            << std::endl;
+            return;
+    }
+    else if (this->age == GOODOLDBLOB) {
+        this->sayHi();
+        return;
+    }
+
+    double currentAngle = this->currentPosition.getAngle();
+    this->currentPosition.rotate(-currentAngle); // Set angle to 0°
+    this->currentPosition.rotate(newAngle); // Set new angle
+
+    this->age++;
+    this->foodCount = 0;
+    return;
+}
+
+void Blob::move(const double modulus) {
+    currentPosition.update(modulus);
+    return;
+}
+void Blob::sayHi(void) {
+    switch (this->age)
+    {
+        case BABYBLOB:
+            std::cout << "Baby blob: ";
+            break;
+        case GROWNBLOB:
+            std::cout << "Grown blob: ";
+            break;
+        case GOODOLDBLOB:
+            std::cout << "Good Old blob: ";
+            break;
+        default:
+            break;
+    }
+    std::cout << "Hi!" << std::endl;
+
+    return;
+}
+
 double Blob::getDeadthChance(void) {
     return this->deathChanceByAge[this->age];
 }
@@ -74,66 +173,18 @@ double Blob::getSmellRadius(void) {
     return this->smellRadiusByAge[this->age];
 }
 
-void Blob::printDeathChance(void) {
-    std::cout << "Pointer: " << deathChanceByAge << std::endl;
-    std::cout << "[";
-    for (int i = BABYBLOB; i < NBLOBS; i++) {
-        std::cout << this->deathChanceByAge[i] << ", ";
-    }
-    std::cout << "]" << std::endl;
-
+double Blob::getMaximumSpeed(void) {
+    return this->maximumSpeed;
 }
 
-void Blob::printCoordinates(void) {
-    double x = 0, y = 0, currangle = 0;
-    this->currentPosition.getPosition(&x, &y);
-    this->currentPosition.getAngle(currangle);
-
-    std::cout << "Position: (" << x << ", " << y << ")" << std::endl;
-    std::cout << "Angle: "<< currangle<< std::endl;
+const Sprite* Blob::getBlobSprite(void) {
+    return &(this->sprites[this->age]);
 }
 
-/*
-bool Blob::birdth(void) {
-    bool newBirdth = false;
-    switch (this->age) {
-        case BABYBLOB:
-            if (this->foodCount == FOOD_BABYBLOB) {
-                newBirdth = true;
-            }
-            break;
-        case GROWNBLOB:
-            if (this->foodCount == FOOD_GROWNBLOB) {
-                newBirdth = true;
-            }
-
-            break;
-        case GOODOLDBLOB:
-            if (this->foodCount == FOOD_GOODOLDBLOB) {
-                newBirdth = true;
-            }
-            break;
-        default:
-            newBirdth = false;
-            break;
-    }
-    return newBirdth;
+void Blob::getCoordinates(double& x, double& y, double& angle) {
+    this->currentPosition.getPosition(x, y);
+    this->currentPosition.getAngle(angle);
+    return;
 }
 
-void Blob::grow(void) {
-    if (this->age == GOODOLDBLOB) return;
-
-    this->blobBirthday();
-}
-*/
 /******************** PRIVATE METHODS ********************/
-
-/*
-void Blob::blobBirthday(void) {
-    if (this->age == GOODOLDBLOB) return;
-
-    this->age++;
-    this->foodCount = 0;
-    this->deathChance = this->deathChanceByAge[this->age];
-}
-*/
