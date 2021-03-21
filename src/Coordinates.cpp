@@ -18,8 +18,8 @@ Coordinates::Coordinates() {
     std::cout << "Coordinates() called" << std::endl;
 #endif
 
-    x = 0.0;
-    y = 0.0;
+    this->position.x = 0.0;
+    this->position.y = 0.0;
     angle = 0.0;
  }
 
@@ -28,8 +28,8 @@ Coordinates::Coordinates(unsigned int maxX, unsigned int maxY) {
     std::cout << "Coordinates(int, int) called" << std::endl;
 #endif
 
-    x = generateRandomNumber(maxX);
-    y = generateRandomNumber(maxY);
+    this->position.x = generateRandomNumber(maxX);
+    this->position.y = generateRandomNumber(maxY);
     angle = generateRandomAngle();
 }
 
@@ -108,24 +108,45 @@ void Coordinates::update(double modulus) {
      */
      // 0 <= angle < 90
     if (isless(this->angle, 90.0)) {
-        this->x += modulus * sin(DEG2RAD(this->angle));
-        this->y -= modulus * cos(DEG2RAD(this->angle));
+        this->position.x += modulus * sin(DEG2RAD(this->angle));
+        this->position.y -= modulus * cos(DEG2RAD(this->angle));
     }
     // 90 <= angle < 180
     else if (isless(this->angle, 180.0)) {
-        this->x += modulus * sin(DEG2RAD(this->angle - 90));
-        this->y += modulus * cos(DEG2RAD(this->angle - 90));
+        this->position.x += modulus * sin(DEG2RAD(this->angle - 90));
+        this->position.y += modulus * cos(DEG2RAD(this->angle - 90));
     }
     // 180 <= angle < 270
     else if (isless(this->angle, 270.0)) {
-        this->x -= modulus * sin(DEG2RAD(this->angle - 180));
-        this->y += modulus * cos(DEG2RAD(this->angle - 180));
+        this->position.x -= modulus * sin(DEG2RAD(this->angle - 180));
+        this->position.y += modulus * cos(DEG2RAD(this->angle - 180));
     }
     // 270 <= angle < 360
     else if (isless(this->angle, 360.0)) {
-        this->x -= modulus * sin(DEG2RAD(this->angle - 270));
-        this->y -= modulus * cos(DEG2RAD(this->angle - 270));
+        this->position.x -= modulus * sin(DEG2RAD(this->angle - 270));
+        this->position.y -= modulus * cos(DEG2RAD(this->angle - 270));
     }
 
     return;
  }
+
+void Coordinates::getPosition(double& x, double& y) {
+    x = this->position.x;
+    y = this->position.y;
+    return;
+}
+
+const Point_t* Coordinates::getPosition(void) {
+    return &(this->position);
+}
+
+void Coordinates::getAngle(double& angle) {
+    angle = this->angle;
+    return;
+}
+
+double Coordinates::getAngle(void) {
+    return this->angle;
+}
+
+/******************** PRIVATE METHODS ********************/
