@@ -26,9 +26,12 @@
     <ClCompile Include="lib\ImGui\imgui_tables.cpp" />
     <ClCompile Include="lib\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="lib\libparse\libparse.c" />
+    <ClCompile Include="src\Blob.cpp" />
     <ClCompile Include="src\Coordinates.cpp" />
+    <ClCompile Include="src\Food.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\randomGenerators.cpp" />
+    <ClCompile Include="src\Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\babyblob.png" />
@@ -46,8 +49,11 @@
     <ClInclude Include="lib\ImGui\imstb_textedit.h" />
     <ClInclude Include="lib\ImGui\imstb_truetype.h" />
     <ClInclude Include="lib\libparse\libparse.h" />
+    <ClInclude Include="src\Blob.h" />
     <ClInclude Include="src\Coordinates.h" />
+    <ClInclude Include="src\Food.h" />
     <ClInclude Include="src\randomGenerators.h" />
+    <ClInclude Include="src\Sprite.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

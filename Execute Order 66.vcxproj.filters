@@ -66,6 +66,15 @@
     <ClCompile Include="lib\ImGui\imgui_tables.cpp">
       <Filter>Source Files\Libraries\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\Blob.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Food.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\babyblob.png">
@@ -114,6 +123,15 @@
     </ClInclude>
     <ClInclude Include="lib\ImGui\imgui_impl_allegro5.h">
       <Filter>Header Files\Libraries\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Blob.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Food.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
