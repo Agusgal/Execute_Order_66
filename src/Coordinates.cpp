@@ -152,15 +152,15 @@ void Coordinates::update(const double modulus) {
     return;
  }
 
-void Coordinates::getPosition(double * x, double * y) {
+void Coordinates::getPosition(double& x, double& y) {
 #ifdef DEBUG
     std::cout
         << "X: " << this->position.x
         << "Y: " << this->position.y
         << std::endl;
 #endif
-    *x = this->position.x;
-    *y = this->position.y;
+    x = this->position.x;
+    y = this->position.y;
     return;
 }
 

@@ -14,12 +14,11 @@ public:
      * Angle is set with a random value in range [0.0 ; 360.0)
      */
     Coordinates(double maxX, double maxY);
-    Coordinates(Point_t& max);
 
     void rotate(const double angle);
     void update(const double modulus);
 
-    void getPosition(double* x, double* y);
+    void getPosition(double& x, double& y);
     const Point_t* getPosition(void);
     void getAngle(double&);
     double getAngle();
