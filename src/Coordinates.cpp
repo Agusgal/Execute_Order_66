@@ -18,33 +18,55 @@ Coordinates::Coordinates() {
     std::cout << "Coordinates() called" << std::endl;
 #endif
 
-    this->position.x = 0.0;
-    this->position.y = 0.0;
+    this->maximumCoordinates = { 0 };
+    this->position = { 0 };
     angle = 0.0;
  }
 
-Coordinates::Coordinates(unsigned int maxX, unsigned int maxY) {
+Coordinates::Coordinates(double maxX, double maxY) {
 #ifdef DEBUG
-    std::cout << "Coordinates(int, int) called" << std::endl;
+    std::cout << "Coordinates(double, double) called" << std::endl;
+    std::cout 
+        << "Coordinates(maxX = " 
+        << maxX
+        << ", maxY = "
+        << maxY
+        << ")"
+        << std::endl;
 #endif
 
-    this->position.x = generateRandomNumber(maxX);
-    this->position.y = generateRandomNumber(maxY);
+    this->maximumCoordinates = { 0 };
+    this->position = { 0 };
+    this->angle = 0;
+
+    if (islessequal(maxX, 0.0) || islessequal(maxY, 0.0)) {
+        std::cout << "Both maxX and maxY must be greater than 0.0" << std::endl;
+        return;
+    }
+    
+    this->maximumCoordinates.x = maxX;
+    this->maximumCoordinates.y = maxY;
+
+    // TODO: Handle floating point in random number generation
+    this->position.x = generateRandomNumber((unsigned)this->maximumCoordinates.x);
+    this->position.y = generateRandomNumber((unsigned)this->maximumCoordinates.y);
     angle = generateRandomAngle();
+    
+    return;
 }
 
 /******************** PUBLIC METHODS ********************/
-void Coordinates::rotate(const double angle) {
+void Coordinates::rotate(const double rotationAngle) {
 #ifdef DEBUG
-    std::cout << "Rotate: " << angle << std::endl;
+    std::cout << "Rotate: " << rotationAngle << std::endl;
 #endif
 
     // Angles that fall out of range (-360.0 ; 360.0) are taken back to this range
-    if (isgreaterequal(fabs(angle), 360.0)) {
-        this->angle += fmod(angle, 360.0);
+    if (isgreaterequal(fabs(rotationAngle), 360.0)) {
+        this->angle += fmod(rotationAngle, 360.0);
     }
     else {
-        this->angle += angle;
+        this->angle += rotationAngle;
     }
 
     // Verify that the new angle does not fall out of range.
@@ -66,7 +88,7 @@ void Coordinates::rotate(const double angle) {
     return;
  }
 
-void Coordinates::update(double modulus) {
+void Coordinates::update(const double modulus) {
 #ifdef DEBUG
     std::cout << "Update (" << modulus << ")" << std::endl;
 #endif
@@ -130,9 +152,15 @@ void Coordinates::update(double modulus) {
     return;
  }
 
-void Coordinates::getPosition(double& x, double& y) {
-    x = this->position.x;
-    y = this->position.y;
+void Coordinates::getPosition(double * x, double * y) {
+#ifdef DEBUG
+    std::cout
+        << "X: " << this->position.x
+        << "Y: " << this->position.y
+        << std::endl;
+#endif
+    *x = this->position.x;
+    *y = this->position.y;
     return;
 }
 
@@ -140,8 +168,8 @@ const Point_t* Coordinates::getPosition(void) {
     return &(this->position);
 }
 
-void Coordinates::getAngle(double& angle) {
-    angle = this->angle;
+void Coordinates::getAngle(double& ang) {
+    ang = this->angle;
     return;
 }
 

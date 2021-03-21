@@ -13,18 +13,20 @@ public:
     /* X, Y are set with a random value between 0.0 and maxX or maxY.
      * Angle is set with a random value in range [0.0 ; 360.0)
      */
-    Coordinates(unsigned int maxX, unsigned int maxY);
+    Coordinates(double maxX, double maxY);
+    Coordinates(Point_t& max);
 
-    void rotate(double angle);
-    void update(double modulus);
+    void rotate(const double angle);
+    void update(const double modulus);
 
-    void getPosition(double& x, double& y);
+    void getPosition(double* x, double* y);
     const Point_t* getPosition(void);
-    void getAngle(double& angle);
+    void getAngle(double&);
     double getAngle();
 
 private:
     Point_t position;
+    Point_t maximumCoordinates;
     double angle;
 };
 
