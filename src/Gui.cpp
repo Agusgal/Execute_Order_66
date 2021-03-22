@@ -5,19 +5,39 @@ Gui::Gui() {
     showMainGuiWindow = true;
     showRunningGuiWindow = false;
 
-    running = true;
+    runningInitial = true;
 
+    display = NULL;
+    queue = NULL;
+    simTimer = NULL;
+    flipTimer = NULL;
+    fps = 120;
+    simTpS = 2;
     displaySizeX = 1280;
     displaySizeY = 720;
 
     guiWindowSizeX = 500;
 
+
+    mode = -1;
+    initialBlobCount = 0;
+    relativeSpeed = 0;
+    maxSpeed = 0;
+    smellRadius = 0;
+    jiggleLimit = 0;
+    deathProbability[0] = 0;
+    deathProbability[1] = 0;
+    deathProbability[2] = 0;
+
+    foodCount = 0;
+    prueba = 0;
+
 }
 
 
-int Gui::Graph(void) {
+int Gui::initialGraph(void) {
 
-    Init();
+    init();
 
     al_set_new_display_flags(ALLEGRO_RESIZABLE);
     display = al_create_display(displaySizeX, displaySizeY);
@@ -29,26 +49,32 @@ int Gui::Graph(void) {
 
     al_set_window_title(display, "Blob Simulation");
 
+    simTimer = al_create_timer(1 / simTpS);
+    flipTimer = al_create_timer(1 / fps);
 
-    if (ConfigureEvents() == -1) {
+
+    if (configureEvents() == -1) {
         return -1;
     }
 
-    if (ConfigureImGui() == -1) {
+    if (configureImGui() == -1) {
         return -1; 
     }
 
+    al_start_timer(simTimer);
+    al_start_timer(flipTimer);
 
     //MainLoop
-    while (running) {
+    while (runningInitial) {
 
         while (al_get_next_event(queue, &ev)) {
 
             ImGui_ImplAllegro5_ProcessEvent(&ev);	// Mandar el evento a Dear ImGui para que lo procese
 
             if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-                running = false;
-                //cerrar
+                runningInitial = false;
+                //falta limpiar()
+                return -1;
             }
             if (ev.type == ALLEGRO_EVENT_DISPLAY_RESIZE)
             {
@@ -56,15 +82,49 @@ int Gui::Graph(void) {
                 al_acknowledge_resize(display);
                 ImGui_ImplAllegro5_CreateDeviceObjects();
             }
+
+            if (ev.type == ALLEGRO_EVENT_TIMER && ev.timer.source == flipTimer){
+                
+                ImGui_ImplAllegro5_NewFrame();
+                ImGui::NewFrame();
+                ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+
+
+                if (initialWindow()) {
+                    runningInitial = false;
+                }
+
+                ImGui::Render();	//No dibuja! Solamente calcula que es lo que tiene que dibujarse
+
+                        // Puedo usar funciones de dibujo de Allegro ademas de las de 
+                        // ImGui.
+                        // Todo lo que dibuje antes de ImGui_ImplAllegro5_RenderDrawData
+                        // va a quedar detras de las ventanas de DearImGui, y todo lo 
+                        // que dibuje despues va a quedar encima de las ventanas de 
+                        // DearImGui.
+
+                al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));	//Va a quedar detras de las ventanas.
+
+                //Todo lo que dibuje aca va a quedar por detrás de las ventanas de DearImGui
+
+                ImGui_ImplAllegro5_RenderDrawData(ImGui::GetDrawData());	//Dibuja las ventanas, pero no hace al_flip_display()
+
+                //Todo lo que dibuje aca va a quedar por encima de las ventanas de DearImGui
+
+
+                //Debe ocurrir con un timer
+                al_flip_display(); //DearImGui nunca hace al_flip_display()
+
+            }
         }
 
-        ImGui_ImplAllegro5_NewFrame();
+        /*ImGui_ImplAllegro5_NewFrame();
         ImGui::NewFrame();
         ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
 
-        if (MainWindow()) {
-            running = false; 
+        if (mainWindow()) {
+            runningInitial = false;
         }
         
         ImGui::Render();	//No dibuja! Solamente calcula que es lo que tiene que dibujarse
@@ -84,22 +144,95 @@ int Gui::Graph(void) {
 
         //Todo lo que dibuje aca va a quedar por encima de las ventanas de DearImGui
 
-        al_flip_display(); //DearImGui nunca hace al_flip_display()
+
+        //Debe ocurrir con un timer
+        al_flip_display(); //DearImGui nunca hace al_flip_display()*/
 
     }
 
     // Cleanup final
     ImGui_ImplAllegro5_Shutdown();
     ImGui::DestroyContext();
-    al_destroy_event_queue(queue);
-    al_destroy_display(display);
-    al_shutdown_primitives_addon();
+    
+    //al_destroy_event_queue(queue);
+    //al_destroy_display(display);
+    //al_shutdown_primitives_addon();
 
     return 0;
 }
 
+int Gui::mainGraph(void) {
 
-int Gui::MainWindow(void) {
+    while (runningMain) {
+
+        while (al_get_next_event(queue, &ev)) {
+
+            ImGui_ImplAllegro5_ProcessEvent(&ev);	// Mandar el evento a Dear ImGui para que lo procese
+
+            if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+                runningMain = false;
+                //falta limpiar()
+                return -1;
+            }
+            if (ev.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
+                ImGui_ImplAllegro5_InvalidateDeviceObjects();
+                al_acknowledge_resize(display);
+                ImGui_ImplAllegro5_CreateDeviceObjects();
+            }
+            if (ev.type == ALLEGRO_EVENT_TIMER && ev.timer.source == simTimer) {
+                prueba++;
+                //aca simulo un tick 
+                //simulate()
+                //draw()
+            }
+            if (ev.type == ALLEGRO_EVENT_TIMER && ev.timer.source == flipTimer) {
+            
+                ImGui_ImplAllegro5_NewFrame();
+                ImGui::NewFrame();
+                ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+
+
+                if (mainWindow()) {
+                    runningInitial = false;
+                }
+
+                ImGui::Render();	//No dibuja! Solamente calcula que es lo que tiene que dibujarse
+
+                        // Puedo usar funciones de dibujo de Allegro ademas de las de 
+                        // ImGui.
+                        // Todo lo que dibuje antes de ImGui_ImplAllegro5_RenderDrawData
+                        // va a quedar detras de las ventanas de DearImGui, y todo lo 
+                        // que dibuje despues va a quedar encima de las ventanas de 
+                        // DearImGui.
+
+                al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));	//Va a quedar detras de las ventanas.
+
+                //Todo lo que dibuje aca va a quedar por detrás de las ventanas de DearImGui
+
+                ImGui_ImplAllegro5_RenderDrawData(ImGui::GetDrawData());	//Dibuja las ventanas, pero no hace al_flip_display()
+
+                //Todo lo que dibuje aca va a quedar por encima de las ventanas de DearImGui
+
+
+                //Debe ocurrir con un timer
+                al_flip_display(); //DearImGui nunca hace al_flip_display()
+            }
+        }
+
+        // Cleanup final
+        ImGui_ImplAllegro5_Shutdown();
+        ImGui::DestroyContext();
+
+        al_destroy_event_queue(queue);
+        al_destroy_display(display);
+        al_shutdown_primitives_addon();
+
+        return 0;
+    }
+}
+
+
+int Gui::initialWindow(void) {
 
     static bool NoTitlebar = true;
     static bool NoMenu = true;
@@ -126,46 +259,51 @@ int Gui::MainWindow(void) {
    
 
     const char* items[] = { "Mode 1", "Mode 2" };
-    static int item_current = 0;
-    ImGui::Combo("Mode", &item_current, items, IM_ARRAYSIZE(items)); //chequear modo simulacion 
+    ImGui::Combo("Mode", &mode, items, IM_ARRAYSIZE(items)); //chequear modo simulacion 
+    
+    ImGui::InputInt("Blob number", &initialBlobCount); //chequear al final que no sean 2 millones
+    ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
 
-    static int blobN = 0;
-    ImGui::InputInt("Blob number", &blobN); //chequear al final que no sean 2 millones
-    ImGui::SameLine(); HelpMarker("Enter values between 0 and 50");
-
-    static float relSpeed = 0.123f;
     //ImGui::SetNextItemWidth(-FLT_MIN);
-    ImGui::SliderFloat("Relative speed", &relSpeed, 0.0f, 1.0f, "speed ratio = %.3f");
+    ImGui::SliderFloat("Relative speed", &relativeSpeed, 0.0f, 1.0f, "speed ratio = %.3f");
 
-    static int maxSpeed = 0;
     ImGui::SliderInt("Max blob speed", &maxSpeed, 1, 30);
-    ImGui::SameLine(); HelpMarker("contrl + click to enter value, must not exceed 50 pixels per tick");
+    ImGui::SameLine(); helpMarker("contrl + click to enter value, must not exceed 50 pixels per tick");
 
-    static int smellRadius = 0;
     ImGui::InputInt("Smell Radius", &smellRadius);//chequear que este bien ingresado
-    ImGui::SameLine(); HelpMarker("Enter values between 0 and 50");
+    ImGui::SameLine();helpMarker("Enter values between 0 and 50");
 
-    static float jiggle = 0.0f;
-    ImGui::SliderAngle("Jiggle Limit", &jiggle);
+    ImGui::SliderAngle("Jiggle Limit", &jiggleLimit, 0.0f, 360.0f);
 
-    static float pDeath1 = 0.0f;
-    ImGui::SliderFloat("BabyBlob", &pDeath1, 0.01f, 0.99f, "P.death = %.3f");
+    ImGui::SliderFloat("BabyBlob", &deathProbability[0], 0.01f, 0.99f, "P.death = %.3f");
 
     static float pDeath2 = 0.0f;
-    ImGui::SliderFloat("GrownBlob", &pDeath2, 0.01f, 0.99f, "P.death = %.3f");
+    ImGui::SliderFloat("GrownBlob", &deathProbability[1], 0.01f, 0.99f, "P.death = %.3f");
 
     static float pDeath3 = 0.0f;
-    ImGui::SliderFloat("GoodOldBlob", &pDeath3, 0.01f, 0.99f, "P.death = %.3f");
+    ImGui::SliderFloat("GoodOldBlob", &deathProbability[2], 0.01f, 0.99f, "P.death = %.3f");
 
-    static int foodCount = 0;
     ImGui::InputInt("Food count", &foodCount); //Chequear que sea un numero valido
-    ImGui::SameLine(); HelpMarker("Enter values between 0 and 50");
+    ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
+
+#ifdef DEBUG_GUI
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+#endif
 
     ImGui::End();
     return 0;
 }
 
-int Gui::Init(void) {
+int Gui::mainWindow(void) {
+
+
+    return 0;
+}
+
+
+
+int Gui::init(void) {
 
     if (!al_init()){
         fprintf(stderr, " failed to initialize allegro !\n");
@@ -191,7 +329,7 @@ int Gui::Init(void) {
 }
  
 
-void Gui::HelpMarker(const char* desc){
+void Gui::helpMarker(const char* desc){
 
     ImGui::TextDisabled("(?)");
     if (ImGui::IsItemHovered())
@@ -204,7 +342,7 @@ void Gui::HelpMarker(const char* desc){
     }
 }
 
-int Gui::ConfigureEvents(void) {
+int Gui::configureEvents(void) {
     queue = al_create_event_queue();
 
     // Controla que la cola de eventos se haya generado
@@ -218,18 +356,23 @@ int Gui::ConfigureEvents(void) {
     al_register_event_source(queue, al_get_display_event_source(display));
     al_register_event_source(queue, al_get_keyboard_event_source());
     al_register_event_source(queue, al_get_mouse_event_source());
-    //faltan eventos de timers
+
+    al_register_event_source(queue, al_get_timer_event_source(simTimer));
+    al_register_event_source(queue, al_get_timer_event_source(flipTimer));
 
     return 0;
 }
 
-int Gui::ConfigureImGui(void) {
+int Gui::configureImGui(void) {
 
     IMGUI_CHECKVERSION();			
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
     ImGui_ImplAllegro5_Init(display);
     ImGui::StyleColorsLight();
     
     return 0; 
+}
+
+bool Gui::getClose(void) {
+    return closeWindow;
 }
