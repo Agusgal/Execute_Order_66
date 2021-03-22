@@ -26,6 +26,22 @@ Food::Food(unsigned int maxX, unsigned int maxY) {
     this->generatePosition();
 }
 
+Food::Food(Point_t& maxCoordinates) {
+    this->current = { 0 };
+    this->maximum = { 0 };
+    
+    if (maxCoordinates.x == 0 || maxCoordinates.y == 0) {
+        std::cout 
+            << "Please provide a value greater than 0 for both X and Y." 
+            << std::endl;
+        return;
+    }
+
+    this->maximum.x = maxCoordinates.x;
+    this->maximum.y = maxCoordinates.y;
+    this->generatePosition();
+}
+
 void Food::getPosition(double& x, double& y) {
     x = this->current.x;
     y = this->current.y;

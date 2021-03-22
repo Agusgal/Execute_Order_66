@@ -86,6 +86,9 @@ World::World(
         this->blobsSize[i] = blobSizeByAge[i]; 
     }
 
+    this->blobsMaxSpeed = blobsMaximumSpeed;
+    this->blobsMaxSpeedIsRnd = blobsMaximumSpeedRandom;
+
     //TODO: createBlobs(blobsNumber);
     //TODO: createFood(foodAmmount);
 

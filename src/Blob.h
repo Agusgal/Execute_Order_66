@@ -19,14 +19,12 @@ enum blobBirdthFood {
 
 class Blob {
 public:
-    /*Blob(const Sprite* sprites[NBLOBS],
-        double maxSpeed, double smellRadius, 
-        double deathChance[NBLOBS]);
-     */
     Blob(Point_t& maxCoordinates, Size_t& dimensions,
         double maxSpeed,
         double deathChance, double smellRadius
     );
+
+    Blob(Point_t& maxCoordinates);
 
     /* This is the blob speed.
      * Modify it at will, it's not taken into account 
@@ -47,10 +45,11 @@ public:
     void getBlobSize(double& width, double& height);
     void getCoordinates(double& x, double& y, double& angle);
 
-    bool setDeathChance(double& chance);
-    bool setSmellRadius(double& radius);
+    bool setDeathChance(double chance);
     bool setDimensions(Size_t& newDim);
-    bool setDimensions(double& newWidth, double& newHeight);
+    bool setDimensions(double newWidth, double newHeight);
+    bool setMaximumSpeed(double speed);
+    bool setSmellRadius(double radius);
 
 private:
     unsigned age;

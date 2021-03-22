@@ -67,10 +67,12 @@ private:
     double height;
 
     /*
-     * All new blobs are created using this three parameters.
+     * All new blobs are created using this four parameters.
      */
     double blobsDeathChance[NBLOBS];
     double blobsSmellRadius[NBLOBS];
+    double blobsMaxSpeed;
+    bool blobsMaxSpeedIsRnd;
     Size_t blobsSize[NBLOBS];
 
     /*

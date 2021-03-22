@@ -5,7 +5,6 @@
 
 
 /******************** DEFINITIONS ********************/
-
 /******************** MACROS ********************/
 /******************** CONSTRUCTOR ********************/
 Blob::Blob(
@@ -57,6 +56,28 @@ Blob::Blob(
 
     this->maximumSpeed = maxSpeed;
     this->maximumPosition = maxCoordinates;
+}
+
+Blob::Blob(Point_t& maxCoordinates) {
+    // Initialize everything
+    this->speed = 0;
+    this->age = BABYBLOB;
+    this->maximumSpeed = 0;
+    this->foodCount = 0;
+    this->deathChance = 0;
+    this->smellRadius = 0;
+    this->dimensions = { 0 };
+    this->maximumPosition = { 0 };
+
+    if (islessequal(dimensions.width, 0.0)
+        || islessequal(dimensions.height, 0.0)) {
+        std::cout
+            << "Invalid dimensions for blob."
+            << std::endl;
+        return;
+    }
+
+    return;
 }
 /******************** PUBLIC METHODS ********************/
 
@@ -183,7 +204,7 @@ void Blob::getCoordinates(double& x, double& y, double& angle) {
     return;
 }
 
-bool Blob::setDeathChance(double& chance) {
+bool Blob::setDeathChance(double chance) {
     if (islessequal(chance, 0.0) || isgreaterequal(chance, 1.0)) {
         std::cout
             << "Death chance must be a value in range (0.0 ; 1.0)."
@@ -196,7 +217,7 @@ bool Blob::setDeathChance(double& chance) {
 }
 
 
-bool Blob::setSmellRadius(double& radius) {
+bool Blob::setSmellRadius(double radius) {
     if (islessequal(radius, 0.0)) {
         std::cout
             << "Smell radius must be greater than zero."
@@ -212,7 +233,7 @@ bool Blob::setDimensions(Size_t& newDim) {
     return this->setDimensions(newDim.width, newDim.height);
 }
 
-bool Blob::setDimensions(double& newWidth, double& newHeight) {
+bool Blob::setDimensions(double newWidth, double newHeight) {
     if (islessequal(newWidth, 0.0) || islessequal(newHeight, 0.0)) {
         std::cout
             << "Blob's width and height must be greater than zero."
@@ -225,4 +246,15 @@ bool Blob::setDimensions(double& newWidth, double& newHeight) {
     return true;
 }
 
+
+bool Blob::setMaximumSpeed(double speed) {
+    if (islessequal(speed, 0.0)) {
+        std::cout
+            << "A blob's maximum speed must be greater than zero."
+            << std::endl;
+        return false;
+    }
+
+    this->maximumSpeed = speed;
+}
 /******************** PRIVATE METHODS ********************/
