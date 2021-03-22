@@ -8,11 +8,12 @@
 
 /******************** MACROS ********************/
 /******************** CONSTRUCTOR ********************/
-Blob::Blob(Point_t& maxCoordinates, Sprite spritesArray[NBLOBS],
+Blob::Blob(
+    Point_t& maxCoordinates, Size_t& dimensions,
     double maxSpeed, 
-    double smellRadius[NBLOBS],
-    double deathChance[NBLOBS]) 
-    : currentPosition(maxCoordinates.x, maxCoordinates.y) {
+    double deathChance,
+    double smellRadius
+    ) : currentPosition(maxCoordinates.x, maxCoordinates.y) {
 
 #ifdef DEBUG
     std::cout << "Blob constructor called." << std::endl;
@@ -20,8 +21,6 @@ Blob::Blob(Point_t& maxCoordinates, Sprite spritesArray[NBLOBS],
         << "Blob(" 
             << "maxCoordinates.x = " << maxCoordinates.x << "maxCoordinates.y = " << maxCoordinates.y
             << maxSpeed  << ", "
-            << "[" << smellRadius[BABYBLOB] << " .. ]"
-            << "[" << deathChance[BABYBLOB] << ", " << deathChance[GROWNBLOB] << ", " << deathChance[GOODOLDBLOB] << "]" << ", "
         <<  ")" 
         << std::endl;
 #endif
@@ -31,45 +30,33 @@ Blob::Blob(Point_t& maxCoordinates, Sprite spritesArray[NBLOBS],
     this->age = BABYBLOB;
     this->maximumSpeed = 0;
     this->foodCount = 0;
-    this->deathChanceByAge = NULL;
-    this->smellRadiusByAge = NULL;
+    this->deathChance = 0;
+    this->smellRadius = 0;
+    this->dimensions = { 0 };
     this->maximumPosition = { 0 };
-    this->sprites = NULL;
 
     // Valid arguments
     if (islessequal(maxSpeed, 0.0)) {
         std::cout << "Maximum speed must be greater than 0." << std::endl;
+        return;
     }
-    else if (spritesArray == NULL) {
-        std::cout << "Recieved NULL pointer for sprites." << std::endl;
+    else if (islessequal(dimensions.width, 0.0)
+        || islessequal(dimensions.height, 0.0)) {
+        std::cout
+            << "Invalid dimensions for blob."
+            << std::endl;
         return;
     }
 
-    for (int i = BABYBLOB; i < NBLOBS; i++) {
-        if (islessequal(deathChance[i], 0.0)) {
-            std::cout 
-                << "Death chance must be greater than 0 for all ages." 
-                << std::endl;
-            return;
-        }
-        else if (islessequal(smellRadius[i], 0.0)) {
-            std::cout 
-                << "Smell radius must be greater than 0 for all ages."
-                << std::endl;
-            return;
-        }
-    }
+    if (this->setDeathChance(deathChance) == false) { return; }
+    if (this->setSmellRadius(smellRadius) == false) { return; }
+    if (this->setDimensions(dimensions) == false) { return;  }
 
     this->age = BABYBLOB;
     this->foodCount = 0;
 
-    this->deathChanceByAge = deathChance;
-    this->smellRadiusByAge = smellRadius;
-
     this->maximumSpeed = maxSpeed;
     this->maximumPosition = maxCoordinates;
-
-    this->sprites = spritesArray;
 }
 /******************** PUBLIC METHODS ********************/
 
@@ -78,8 +65,10 @@ void Blob::die(void) {
     this->age = BABYBLOB;
     this->maximumSpeed = 0;
     this->foodCount = 0;
-    this->deathChanceByAge = NULL;
-    this->smellRadiusByAge = NULL;
+    this->deathChance = 0;
+    this->smellRadius = 0;
+    this->dimensions.height = 0;
+    this->dimensions.width = 0;
     this->maximumPosition.x = 0;
     this->maximumPosition.y = 0;
 
@@ -165,26 +154,75 @@ void Blob::sayHi(void) {
     return;
 }
 
-double Blob::getDeadthChance(void) {
-    return this->deathChanceByAge[this->age];
+const Size_t* Blob::getBlobSize(void) {
+    return &(this->dimensions);
 }
 
-double Blob::getSmellRadius(void) {
-    return this->smellRadiusByAge[this->age];
+void Blob::getBlobSize(double& width, double& height) {
+    width = this->dimensions.width;
+    height = this->dimensions.height;
+    
+    return;
+}
+
+double Blob::getDeadthChance(void) {
+    return this->deathChance;
 }
 
 double Blob::getMaximumSpeed(void) {
     return this->maximumSpeed;
 }
 
-const Sprite* Blob::getBlobSprite(void) {
-    return &(this->sprites[this->age]);
+double Blob::getSmellRadius(void) {
+    return this->smellRadius;
 }
 
 void Blob::getCoordinates(double& x, double& y, double& angle) {
     this->currentPosition.getPosition(x, y);
     this->currentPosition.getAngle(angle);
     return;
+}
+
+bool Blob::setDeathChance(double& chance) {
+    if (islessequal(chance, 0.0) || isgreaterequal(chance, 1.0)) {
+        std::cout
+            << "Death chance must be a value in range (0.0 ; 1.0)."
+            << std::endl;
+        return false;
+    }
+    
+    this->deathChance = chance;
+    return true;
+}
+
+
+bool Blob::setSmellRadius(double& radius) {
+    if (islessequal(radius, 0.0)) {
+        std::cout
+            << "Smell radius must be greater than zero."
+            << std::endl;
+        return false;
+    }
+    
+    this->smellRadius = radius;
+    return true;
+}
+
+bool Blob::setDimensions(Size_t& newDim) {
+    return this->setDimensions(newDim.width, newDim.height);
+}
+
+bool Blob::setDimensions(double& newWidth, double& newHeight) {
+    if (islessequal(newWidth, 0.0) || islessequal(newHeight, 0.0)) {
+        std::cout
+            << "Blob's width and height must be greater than zero."
+            << std::endl;
+        return false;
+    }
+
+    dimensions.width = newWidth;
+    dimensions.height = newHeight;
+    return true;
 }
 
 /******************** PRIVATE METHODS ********************/

@@ -23,9 +23,9 @@ public:
         double maxSpeed, double smellRadius, 
         double deathChance[NBLOBS]);
      */
-    Blob(Point_t& maxCoordinates, Sprite sprites[NBLOBS],
+    Blob(Point_t& maxCoordinates, Size_t& dimensions,
         double maxSpeed,
-        double smellRadius[NBLOBS], double deathChance[NBLOBS]
+        double deathChance, double smellRadius
     );
 
     /* This is the blob speed.
@@ -43,21 +43,26 @@ public:
     double getDeadthChance(void);
     double getSmellRadius(void);
     double getMaximumSpeed(void);
-    
-    const Sprite* getBlobSprite(void);
+    const Size_t* getBlobSize(void);
+    void getBlobSize(double& width, double& height);
     void getCoordinates(double& x, double& y, double& angle);
+
+    bool setDeathChance(double& chance);
+    bool setSmellRadius(double& radius);
+    bool setDimensions(Size_t& newDim);
+    bool setDimensions(double& newWidth, double& newHeight);
 
 private:
     unsigned age;
     double maximumSpeed;
     unsigned foodCount;
 
-    double * deathChanceByAge;
-    double * smellRadiusByAge;
+    double deathChance;
+    double smellRadius;
 
+    Size_t dimensions;
     Point_t maximumPosition;
     Coordinates currentPosition;
-    Sprite * sprites;
 };
 
 #endif /* ! BLOB_H */
