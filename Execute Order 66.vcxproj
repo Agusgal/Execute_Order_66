@@ -29,6 +29,7 @@
     <ClCompile Include="src\Blob.cpp" />
     <ClCompile Include="src\Coordinates.cpp" />
     <ClCompile Include="src\Food.cpp" />
+    <ClCompile Include="src\Gui.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\randomGenerators.cpp" />
     <ClCompile Include="src\SDLL.cpp" />
@@ -54,6 +55,7 @@
     <ClInclude Include="src\Blob.h" />
     <ClInclude Include="src\Coordinates.h" />
     <ClInclude Include="src\Food.h" />
+    <ClInclude Include="src\Gui.h" />
     <ClInclude Include="src\randomGenerators.h" />
     <ClInclude Include="src\SDLL.h" />
     <ClInclude Include="src\Sprite.h" />
