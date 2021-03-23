@@ -7,6 +7,8 @@ public:
     Food(Point_t& maxCoordinates);
     Food(unsigned int maxX, unsigned int maxY);
 
+    void destroy(void);
+
     void getPosition(double& x, double& y);
     const Point_t* getPosition(void);
 

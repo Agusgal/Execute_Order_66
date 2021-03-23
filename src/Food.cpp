@@ -9,7 +9,6 @@
 
 /******************** CONSTRUCTOR ********************/
 
-/******************** PUBLIC METHODS ********************/
 Food::Food(unsigned int maxX, unsigned int maxY) {
     this->current = { 0 };
     this->maximum = { 0 };
@@ -40,6 +39,15 @@ Food::Food(Point_t& maxCoordinates) {
     this->maximum.x = maxCoordinates.x;
     this->maximum.y = maxCoordinates.y;
     this->generatePosition();
+}
+
+/******************** PUBLIC METHODS ********************/
+void Food::destroy(void) {
+    this->current.x = 0;
+    this->current.y = 0;
+    this->maximum.x = 0;
+    this->maximum.y = 0;
+    return;
 }
 
 void Food::getPosition(double& x, double& y) {
