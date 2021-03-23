@@ -6,7 +6,7 @@
 #include "Food.h"
 
 enum dataTypes {
-    INVALID = -1,
+    SDLL_DT_INVALID = -1,
     SDLL_DT_BLOB = 0,
     SDLL_DT_FOOD,
     NDATATYPES
@@ -28,13 +28,17 @@ public:
      * of the list.
      */
     SDLL_Node(int dataType, Point_t& maxCoordinates, 
-        SDLL_Node* next = NULL, SDLL_Node* prev = NULL);
+        SDLL_Node* prev = NULL, SDLL_Node* next = NULL);
 
     int getDataType(void);
-    const union SDLL_Node_DataType* getData(void);
-    const SDLL_Node* getNextNode(void);
-    const SDLL_Node* getPrevNode(void);
+    union SDLL_Node_DataType* getData(void);
+    SDLL_Node* getNextNode(void);
+    SDLL_Node* getPrevNode(void);
 
+    void setNextNode(SDLL_Node* node);
+    void setPrevNode(SDLL_Node* node);
+
+    bool destroy(void);
 private:
     int type;
     union SDLL_Node_DataType data;
@@ -54,19 +58,27 @@ public:
     SDLL(int dataType, Point_t& maxCoordinates);
 
 
-    // This functions return true on success and false on failure.
-    bool append(void); // New node after tail.
-    bool destroy(void); // Destroy all nodes.
-    bool insertAfter(SDLL_Node& node); // Create a new node after _node_.
-    bool insertBefore(SDLL_Node& node); // Create a new node before _node_.
-    bool pop(void); // Remove current tail.
-    bool remove(SDLL_Node& node); // Remove _node_ from list.
+    // This functions return a pointer to created node.
+    SDLL_Node* append(void); // New node after tail.
+    SDLL_Node* insertAfter(SDLL_Node* node); // Create a new node after _node_.
+    SDLL_Node* insertBefore(SDLL_Node* node); // Create a new node before _node_.
 
-    const SDLL_Node* getHead(void);
-    const SDLL_Node* getTail(void);
+    // This functions return true on success and false on failure.
+    bool destroy(void); // Destroy all nodes, head included.
+    bool pop(void); // Remove current tail unless the list has only one element.
+    bool remove(SDLL_Node* node); // Remove _node_ from list.
+
+    SDLL_Node* getHead(void);
+    SDLL_Node* getTail(void);
 
 private:
+    // Only enabled when destroying.
+    // Allows remove() to destroy the list's head if it's 
+    // the only node.
+    bool removeHead; 
+
     int dataType;
+    Point_t maximumCoordinates;
 
     SDLL_Node* head;
     SDLL_Node* tail; // To pop and append faster :)
