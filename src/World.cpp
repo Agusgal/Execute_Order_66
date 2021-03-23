@@ -5,8 +5,12 @@
 #include "World.h"
 
 /******************** DEFINITIONS ********************/
+#define EATING_DISTANCE     (1.0)
 
 /******************** MACROS ********************/
+
+
+long double distance(Point_t& firstPoint, Point_t& secondPoint);
 
 /******************** CONSTRUCTOR ********************/
 World::World(
@@ -18,10 +22,14 @@ World::World(
     bool blobsMaximumSpeedRandom
 ) {
     // Initialize everything 
-    this->width = 0.0;
-    this->height = 0.0;
+    this->blobsList = NULL;
+    this->foodList = NULL;
+    this->dimensions = { 0 };
     this->foodAvailable = 0;
     this->aliveBlobs = 0;
+    this->blobsMaxSpeed = 0;
+    this->blobsMaxSpeedIsRnd = false;
+
     for (int i = BABYBLOB; i < NBLOBS; i++) {
         this->blobsDeathChance[i] = 0;
         this->blobsSmellRadius[i] = 0;
@@ -77,8 +85,8 @@ World::World(
         }
     }
 
-    this->width = worldWidth;
-    this->height = worldHeight;
+    this->dimensions.width = worldWidth;
+    this->dimensions.height = worldHeight;
 
     for (int i = BABYBLOB; i < NBLOBS; i++) {
         this->blobsDeathChance[i] = deathChance[i];
@@ -89,27 +97,228 @@ World::World(
     this->blobsMaxSpeed = blobsMaximumSpeed;
     this->blobsMaxSpeedIsRnd = blobsMaximumSpeedRandom;
 
-    //TODO: createBlobs(blobsNumber);
-    //TODO: createFood(foodAmmount);
+    // Allocate Blob and Food list
+    Point_t worldMax = {0};
+    worldMax.x = this->dimensions.width;
+    worldMax.y = this->dimensions.height;
+
+    this->blobsList = new SDLL(SDLL_DT_BLOB, worldMax);
+    if (this->blobsList == NULL) {
+        std::cout 
+            << "Unable to create blobs list. Aborting."
+            << std::endl;
+        return;
+    }
+
+    this->foodList = new SDLL(SDLL_DT_FOOD, worldMax);
+    if (this->foodList == NULL) {
+        std::cout 
+            << "Unable to create food list. Aborting."
+            << std::endl;
+        return;
+    }
+
+    // Generate the desired blobs and food
+    for (unsigned int i = 0; i < blobsNumber; i++) {
+        if (this->createBlob() == false) {
+            std::cout
+                << "Unable to create a new blob. Aborting."
+                << std::endl;
+            return;
+        }
+    }
+
+    for (unsigned int i = 0; i < foodAmmount; i++) {
+        if (this->createFood() == false) {
+            std::cout
+                << "Unable to create new food. Aborting."
+                << std::endl;
+            return;
+        }
+    }
+
 
     return;
 }
 
 /******************** PUBLIC METHODS ********************/
+void World::destroy(void) {
+    if (this->blobsList != NULL)    { blobsList->destroy(); }
+    if (this->foodList != NULL)     { foodList->destroy();  }
+    this->foodAvailable = 0;
+    this->aliveBlobs = 0;
+    this->dimensions.width = 0;
+    this->dimensions.height = 0;
+    this->blobsMaxSpeed = 0;
+    this->blobsMaxSpeedIsRnd = false;
+    for (int i = BABYBLOB; i < NBLOBS; i++) {
+        this->blobsDeathChance[i] = 0;
+        this->blobsSmellRadius[i] = 0;
+        this->blobsSize[i].width = 0;
+        this->blobsSize[i].height = 0;
+    }
+
+    return;
+}
+
 bool World::checkFood(void) {
-    std::cout << "Not implemented." << std::endl;
+    Point_t blobPosition = { 0 };
+    double blobAngle = 0;
+    Point_t nearestFoodPosition = { 0 };
+
+    for (SDLL_Node* currentNode = blobsList->getHead(); 
+            currentNode != NULL; 
+            currentNode = currentNode->getNextNode()) {
+        
+        Blob* currentBlob = currentNode->getData()->blob;
+        Food* nearestFood = smell(*currentBlob);
+
+        // Food is inside smellRadius. 
+        // Let's see if in the same position as the blob (and eat it if so!)
+        if (nearestFood != NULL) {
+            currentBlob->getCoordinates(blobPosition.x, blobPosition.y, blobAngle);
+            nearestFood->getPosition(nearestFoodPosition.x, nearestFoodPosition.y);
+
+            if (islessequal(distance(blobPosition, nearestFoodPosition), EATING_DISTANCE)) {
+                eatAndReproduce(*currentBlob);
+            }
+        }
+    }
+
     return false;
 }
 
-bool World::checkMerge(void) {
-    std::cout << "Not implemented." << std::endl;
-    return false;
+bool World::blobsDeath(Blob& blob) {
+    bool aBlobHasDied = false;
+
+    SDLL_Node* node = this->findBlobNode(&blob);
+    if (node == NULL) {
+        return false;
+    }
+
+    if (isless(blob.getDeadthChance(), generateRandomNumber(1))) {
+        this->blobsList->remove(node);
+        aBlobHasDied = true;
+    }
+
+    return aBlobHasDied;
+}
+
+bool World::checkMerge(const double randomJiggleLimit) {
+    bool atLeastOneMerge = false;
+
+    // Store the current tail's address so newly born blobs (appended to the list)
+    // are not taken into account.
+    SDLL_Node* listTail = this->blobsList->getTail(); 
+
+    bool thisPairMerged = false;
+
+    for (SDLL_Node * mainNode = this->blobsList->getHead();
+        mainNode != listTail;
+        mainNode = mainNode->getNextNode()) {
+
+        Blob* mainBlob = mainNode->getData()->blob;
+        if (mainBlob == NULL) {
+            std::cout << "List looping error." << std::endl;
+            break;
+        }
+
+        for (SDLL_Node * secondaryNode = mainNode->getNextNode();
+            secondaryNode != NULL;
+            secondaryNode->getNextNode()) {
+
+            Blob* secondaryBlob = secondaryNode->getData()->blob;
+            if (secondaryBlob == NULL) {
+                std::cout << "List looping error." << std::endl;
+                break;
+            }
+
+            thisPairMerged = this->mergeBlobs(*mainBlob, *secondaryBlob, randomJiggleLimit);
+            if (thisPairMerged == true) { atLeastOneMerge = true; }
+        }
+    }
+
+    return atLeastOneMerge;
 }
 
 bool World::status(void) {
-    std::cout << "Not implemented." << std::endl;
+    if (this->aliveBlobs > 0) return true;
     return false;
 }
+
+const Blob* World::getNextBlob(Blob* lastBlob) {
+    if (lastBlob == NULL) {
+        return this->blobsList->getHead()->getData()->blob;
+    }
+
+    SDLL_Node* blobNode = this->findBlobNode(lastBlob);
+
+    if (blobNode == NULL) {
+        return NULL;
+    }
+
+    // We have _lastBlob_ (if blobNode != NULL), let's get the next blob
+    blobNode = blobNode->getNextNode();
+    if (blobNode == NULL) {
+        return NULL;
+    }
+
+    return blobNode->getData()->blob;
+}
+
+SDLL_Node* World::findBlobNode(Blob* blob) {
+    if (this->blobsList == NULL) {
+        return NULL;
+    }
+
+    // Find out to which node this blob belogs
+    // _blobNode_ will end up being the node with _blob_
+    SDLL_Node* blobNode = this->blobsList->getHead();
+
+    while (blobNode->getData()->blob != blob) {
+        blobNode = blobNode->getNextNode();
+        
+        if (blobNode == NULL) {
+            // _blob_ was not found in the list.
+            std::cout << "Unable to find the given blob." << std::endl;
+            return NULL;
+        }
+    }
+
+    return blobNode;
+}
+
+const Food* World::getNextFood(Food* lastFood) {
+    if (this->foodList == NULL) {
+        return NULL;
+    }
+
+    if (lastFood == NULL) {
+        return this->foodList->getHead()->getData()->food;
+    }
+
+    // Find out to which node this food belogs
+    // _blobNode_ will end up being the node with _lastFood_
+    SDLL_Node* foodNode = this->foodList->getHead();
+
+    while (foodNode->getData()->food != lastFood) {
+        foodNode = foodNode->getNextNode();
+        if (foodNode == NULL) {
+            break;
+        }
+    }
+    // We have _lastFood_ (if foodNode != NULL), let's get the next food
+    if (foodNode != NULL) foodNode = foodNode->getNextNode();
+
+    // The next food doesn't exist or _lastFood_ was not found in the list.
+    if (foodNode == NULL) {
+        std::cout << "Unable to find the given food." << std::endl;
+        return NULL;
+    }
+    
+    return foodNode->getData()->food;
+}
+
 
 bool World::setDeathChance(const int age, const double newChance) {
     if (age < BABYBLOB || age > GOODOLDBLOB) {
@@ -155,17 +364,149 @@ bool World::setSmellRadius(const int age, const double newRadius) {
 
 
 /******************** PRIVATE METHODS ********************/
-bool World::mergeBlobs(Blob& blob1, Blob& blob2) {
-    std::cout << "Not implemented." << std::endl;
-    return false;
+bool World::createBlob(void) {
+    if (blobsList == NULL) {
+        std::cout
+            << "blobsList is NULL !!!"
+            << std::endl;
+        return false;
+    }
+
+    Blob* lastBlob = NULL;
+
+    if (this->blobsList->append() == NULL) {
+        return false;
+    }
+
+    // Initialize blob
+    lastBlob = this->blobsList->getTail()->getData()->blob;
+    lastBlob->setDimensions(this->blobsSize[BABYBLOB]);
+    lastBlob->setDeathChance(this->blobsDeathChance[BABYBLOB]);
+    lastBlob->setSmellRadius(this->blobsSmellRadius[BABYBLOB]);
+    if (this->blobsMaxSpeedIsRnd == true) {
+        lastBlob->setMaximumSpeed(generateRandomNumber((unsigned) this->blobsMaxSpeed));
+    }
+    else {
+        lastBlob->setMaximumSpeed(this->blobsMaxSpeed);
+    }
+
+    this->aliveBlobs++;
+    return true;
+}
+
+bool World::createFood(void) {
+    if (foodList == NULL) {
+        std::cout
+            << "foodList is NULL !!!"
+            << std::endl;
+        return false;
+    }
+
+    if (this->foodList->append() == NULL) {
+        return false;
+    }
+
+    this->foodAvailable++;
+    return true;
+}
+
+void World::updateFood(Food& food) {
+    food.updatePosition();
+    return;
+}
+
+bool World::mergeBlobs(Blob& blob1, Blob& blob2, const double randomJiggleLimmit) {
+    Point_t fbP = { 0 };    // First Blob's Position
+    double fbA = 0;         // First Blob's Angle
+    Point_t fbS = { 0 };     // First Blob's Size stored as Point_t for distance()
+
+    Point_t sbP = { 0 };    // Second Blob's Position
+    double sbA = 0;         // Second Blob's Angle
+
+    if (blob1.getAge() != blob2.getAge()) {
+        blob1.sayHi();
+        blob2.sayHi();
+        return false;
+    }
+
+    blob1.getCoordinates(fbP.x, fbP.y, fbA);
+    blob2.getCoordinates(sbP.x, sbP.y, sbA);
+
+    blob1.getBlobSize(fbS.x, fbS.y);
+
+    // Blobs are one above the other or not.
+    if (! isless(distance(fbP, sbP), 2 * distance(fbP, fbS))) {
+        return false;
+    }
+
+    blob1.setPointingDirection( ( fbA 
+                                 + sbA 
+                                 + generateRandomNumber((unsigned) fabs(randomJiggleLimmit))
+                                ) / 3);
+
+    return true;
 }
 
 bool World::eatAndReproduce(Blob& blob) {
-    std::cout << "Not implemented." << std::endl;
-    return false;
+    bool newBirdth = blob.eat();
+    
+    // Change the food's position, let the blob eat it and verify if a new
+    // blob must be born.
+    if (newBirdth == true) {
+        this->createBlob();
+    }
+    return newBirdth;
 }
 
-bool World::smell(Blob& blob) {
-    std::cout << "Not implemented." << std::endl;
-    return false;
+Food* World::smell(Blob& blob) {
+    Point_t blobPosition = { 0 };
+    double blobAngle = 0;
+    blob.getCoordinates(blobPosition.x, blobPosition.y, blobAngle);
+
+    Point_t foodPosition = { 0 };
+    // This value makes no sense, so it will be ommited when less than one 
+    // pieces of food are in conflict.
+    long double nearestFoodDistance = 2 * blob.getSmellRadius(); 
+    Point_t nearestFoodPosition = { 0 };
+    Food* nearestFood = NULL;
+
+    Food* food = NULL;
+    SDLL_Node * foodNode = this->foodList->getHead();
+
+    while (foodNode != NULL) {
+        food = foodNode->getData()->food;
+        if (food == NULL) { return NULL; }
+
+        food->getPosition(foodPosition.x, foodPosition.y);
+
+        // Blob is near enough of its food
+        long double foodDistance = distance(blobPosition, foodPosition);
+
+        if (islessequal(foodDistance, blob.getSmellRadius()) 
+            && isless(foodDistance, nearestFoodDistance)) {
+            
+            nearestFoodDistance = foodDistance;
+            nearestFoodPosition.x = foodPosition.x;
+            nearestFoodPosition.y = foodPosition.y;
+            nearestFood = food;
+        }
+
+        foodNode = foodNode->getNextNode();
+    }
+
+    if (nearestFood != NULL) {
+        blob.setPointingDirection(nearestFoodPosition.x, nearestFoodPosition.y);
+    }
+    
+    return nearestFood;
+}
+
+
+/*== STATIC FUNCTIONS ==*/
+long double distance(Point_t& firstPoint, Point_t& secondPoint) {
+    return  (sqrtl(
+                powl(firstPoint.x - secondPoint.x, 2.0)
+                +
+                powl(firstPoint.y - secondPoint.y, 2.0))
+            );
 }
