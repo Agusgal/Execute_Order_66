@@ -45,6 +45,7 @@ public:
     const Size_t* getBlobSize(void);
     void getBlobSize(double& width, double& height);
     void getCoordinates(double& x, double& y, double& angle);
+    void getPoint(double& x, double& y); // Same as getCoordinates without angle
 
     bool setDeathChance(double chance);
     bool setDimensions(Size_t& newDim);
@@ -63,7 +64,6 @@ private:
     double smellRadius;
 
     Size_t dimensions;
-    Point_t maximumPosition;
     Coordinates currentPosition;
 };
 

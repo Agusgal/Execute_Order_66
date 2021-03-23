@@ -33,7 +33,6 @@ Blob::Blob(
     this->deathChance = 0;
     this->smellRadius = 0;
     this->dimensions = { 0 };
-    this->maximumPosition = { 0 };
 
     // Valid arguments
     if (islessequal(maxSpeed, 0.0)) {
@@ -56,7 +55,6 @@ Blob::Blob(
     this->foodCount = 0;
 
     this->maximumSpeed = maxSpeed;
-    this->maximumPosition = maxCoordinates;
 }
 
 Blob::Blob(Point_t& maxCoordinates) 
@@ -69,15 +67,6 @@ Blob::Blob(Point_t& maxCoordinates)
     this->deathChance = 0;
     this->smellRadius = 0;
     this->dimensions = { 0 };
-    this->maximumPosition = { 0 };
-
-    if (islessequal(dimensions.width, 0.0)
-        || islessequal(dimensions.height, 0.0)) {
-        std::cout
-            << "Invalid dimensions for blob."
-            << std::endl;
-        return;
-    }
 
     return;
 }
@@ -96,8 +85,6 @@ void Blob::die(void) {
     this->smellRadius = 0;
     this->dimensions.height = 0;
     this->dimensions.width = 0;
-    this->maximumPosition.x = 0;
-    this->maximumPosition.y = 0;
 
     return;
 }
@@ -207,6 +194,11 @@ double Blob::getSmellRadius(void) {
 void Blob::getCoordinates(double& x, double& y, double& angle) {
     this->currentPosition.getPosition(x, y);
     this->currentPosition.getAngle(angle);
+    return;
+}
+
+void Blob::getPoint(double& x, double& y) {
+    this->currentPosition.getPosition(x, y);
     return;
 }
 
