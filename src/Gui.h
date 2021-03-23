@@ -64,6 +64,12 @@ private:
     ALLEGRO_TIMER* simTimer;
     ALLEGRO_TIMER* flipTimer;
 
+    ALLEGRO_BITMAP* background;
+    ALLEGRO_BITMAP* babyBlob;
+    ALLEGRO_BITMAP* food;
+    ALLEGRO_BITMAP* grownBlob;
+    ALLEGRO_BITMAP* goodOldBlob;
+
     int displaySizeX;
     int displaySizeY;
 
