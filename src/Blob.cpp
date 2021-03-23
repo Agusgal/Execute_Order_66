@@ -3,9 +3,10 @@
 
 #include "Blob.h"
 
-
 /******************** DEFINITIONS ********************/
+
 /******************** MACROS ********************/
+
 /******************** CONSTRUCTOR ********************/
 Blob::Blob(
     Point_t& maxCoordinates, Size_t& dimensions,
@@ -58,7 +59,8 @@ Blob::Blob(
     this->maximumPosition = maxCoordinates;
 }
 
-Blob::Blob(Point_t& maxCoordinates) {
+Blob::Blob(Point_t& maxCoordinates) 
+    : currentPosition(maxCoordinates.x, maxCoordinates.y) {
     // Initialize everything
     this->speed = 0;
     this->age = BABYBLOB;
@@ -80,6 +82,10 @@ Blob::Blob(Point_t& maxCoordinates) {
     return;
 }
 /******************** PUBLIC METHODS ********************/
+
+int Blob::getAge(void) {
+    return this->age;
+}
 
 void Blob::die(void) {
     this->speed = 0;
@@ -216,19 +222,6 @@ bool Blob::setDeathChance(double chance) {
     return true;
 }
 
-
-bool Blob::setSmellRadius(double radius) {
-    if (islessequal(radius, 0.0)) {
-        std::cout
-            << "Smell radius must be greater than zero."
-            << std::endl;
-        return false;
-    }
-    
-    this->smellRadius = radius;
-    return true;
-}
-
 bool Blob::setDimensions(Size_t& newDim) {
     return this->setDimensions(newDim.width, newDim.height);
 }
@@ -246,15 +239,52 @@ bool Blob::setDimensions(double newWidth, double newHeight) {
     return true;
 }
 
+bool Blob::setPointingDirection(double newAngle) {
+    this->currentPosition.rotate(newAngle);
+    return true;
+}
 
-bool Blob::setMaximumSpeed(double speed) {
-    if (islessequal(speed, 0.0)) {
+bool Blob::setPointingDirection(double x, double y) {
+    double blobX = 0, blobY = 0;
+    double newAngle = 0;
+
+    this->currentPosition.getPosition(blobX, blobY);
+    
+    double num = fabs(blobX - x);
+    double denom = fabs(blobY - y);
+
+    if (islessequal(denom, 0.0)) {
+        newAngle = 0;
+    }
+    else {
+        newAngle = atan2(num, denom);
+    }
+
+    this->currentPosition.rotateRadians(newAngle);
+    return true;
+}
+
+bool Blob::setMaximumSpeed(double newMaxSpeed) {
+    if (islessequal(newMaxSpeed, 0.0)) {
         std::cout
             << "A blob's maximum speed must be greater than zero."
             << std::endl;
         return false;
     }
 
-    this->maximumSpeed = speed;
+    this->maximumSpeed = newMaxSpeed;
+    return true;
+}
+
+bool Blob::setSmellRadius(double radius) {
+    if (islessequal(radius, 0.0)) {
+        std::cout
+            << "Smell radius must be greater than zero."
+            << std::endl;
+        return false;
+    }
+    
+    this->smellRadius = radius;
+    return true;
 }
 /******************** PRIVATE METHODS ********************/

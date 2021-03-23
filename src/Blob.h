@@ -34,10 +34,11 @@ public:
     void die(void);
     /* Increment food counter and return if a new birdth should happen */
     bool eat(void);
-    void grow(const double newAngle);
+    void grow(const double newAngle); // This happens on merge
     void move(const double modulus);
     void sayHi(void);
 
+    int getAge(void);
     double getDeadthChance(void);
     double getSmellRadius(void);
     double getMaximumSpeed(void);
@@ -48,7 +49,9 @@ public:
     bool setDeathChance(double chance);
     bool setDimensions(Size_t& newDim);
     bool setDimensions(double newWidth, double newHeight);
-    bool setMaximumSpeed(double speed);
+    bool setPointingDirection(double newAngle);
+    bool setPointingDirection(double x, double y); // Angle will be calculated to make blob point towards x and y
+    bool setMaximumSpeed(double newMaxSpeed);
     bool setSmellRadius(double radius);
 
 private:
