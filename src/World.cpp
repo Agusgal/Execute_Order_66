@@ -246,7 +246,7 @@ bool World::status(void) {
     return false;
 }
 
-const Blob* World::getNextBlob(Blob* lastBlob) {
+Blob* World::getNextBlob(Blob* lastBlob) {
     if (lastBlob == NULL) {
         return this->blobsList->getHead()->getData()->blob;
     }
@@ -288,7 +288,7 @@ SDLL_Node* World::findBlobNode(Blob* blob) {
     return blobNode;
 }
 
-const Food* World::getNextFood(Food* lastFood) {
+Food* World::getNextFood(Food* lastFood) {
     if (this->foodList == NULL) {
         return NULL;
     }

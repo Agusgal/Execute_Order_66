@@ -68,8 +68,8 @@ public:
      * An argument of NULL returns the first one in the list.
      * NULL if there's no other element in the list.
      */
-    const Blob* getNextBlob(Blob* lastBlob = NULL);
-    const Food* getNextFood(Food* lastFood = NULL);
+    Blob* getNextBlob(Blob* lastBlob = NULL);
+    Food* getNextFood(Food* lastFood = NULL);
 
     /*
      * Returns false on error.
