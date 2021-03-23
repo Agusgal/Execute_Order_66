@@ -9,8 +9,10 @@
 /******************** DEFINITIONS ********************/
 
 /******************** MACROS ********************/
-// Convert degree in radians
-#define DEG2RAD(d)      ((d)*(M_PI/180))
+// Convert degrees in radians
+#define DEG2RAD(d)      ((d)*M_PI/180)
+// Convert radians in degrees
+#define RAD2DEG(r)      ((r)*180/M_PI)
 
 /******************** CONSTRUCTOR ********************/
 Coordinates::Coordinates() {
@@ -56,6 +58,10 @@ Coordinates::Coordinates(double maxX, double maxY) {
 }
 
 /******************** PUBLIC METHODS ********************/
+void Coordinates::rotateRadians(const double angleInRadians) {
+    this->rotate(RAD2DEG(angleInRadians));
+    return;
+}
 void Coordinates::rotate(const double rotationAngle) {
 #ifdef DEBUG
     std::cout << "Rotate: " << rotationAngle << std::endl;

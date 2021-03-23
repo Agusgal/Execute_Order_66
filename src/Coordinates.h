@@ -16,6 +16,7 @@ public:
     Coordinates(double maxX, double maxY);
 
     void rotate(const double angle);
+    void rotateRadians(const double angleInRadians);
     void update(const double modulus);
 
     void getPosition(double& x, double& y);
