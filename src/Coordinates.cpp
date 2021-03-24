@@ -162,6 +162,16 @@ void Coordinates::update(const double modulus) {
         this->position.y -= modulus * cos(DEG2RAD(this->angle - 270));
     }
 
+    // Stay inside bounds
+    if (isgreaterequal(this->position.x, this->maximumCoordinates.x)) {
+        this->position.x -= this->maximumCoordinates.x;
+    }
+
+    if (isgreaterequal(this->position.y, this->maximumCoordinates.y)) {
+        this->position.y -= this->maximumCoordinates.y;
+    }
+
+
     return;
  }
 
