@@ -268,7 +268,7 @@ bool World::blobsDeath(Blob& blob) {
         return false;
     }
 
-    if (isless(generateRandomNumber(1), blob.getDeadthChance())) {
+    if (isless(generateRandomNumber(1.0), blob.getDeadthChance())) {
         this->blobsList->remove(node);
         aBlobHasDied = true;
     }
@@ -444,7 +444,7 @@ void World::setMaxSpeed(float speed) {
         current != NULL; current = current->getNextNode()) {
         
         if (this->blobsMaxSpeedIsRnd) {
-            current->getData()->blob->setMaximumSpeed(generateRandomNumber((unsigned) this->blobsMaxSpeed));
+            current->getData()->blob->setMaximumSpeed(generateRandomNumber(this->blobsMaxSpeed));
         }
         else {
             current->getData()->blob->setMaximumSpeed(this->blobsMaxSpeed);
@@ -508,7 +508,7 @@ void World::initializeBlob(Blob* blob) {
     blob->setDeathChance(this->blobsDeathChance[BABYBLOB]);
     blob->setSmellRadius(this->blobsSmellRadius[BABYBLOB]);
     if (this->blobsMaxSpeedIsRnd == true) {
-        blob->setMaximumSpeed(generateRandomNumber((unsigned) this->blobsMaxSpeed));
+        blob->setMaximumSpeed(generateRandomNumber(this->blobsMaxSpeed));
     }
     else {
         blob->setMaximumSpeed(this->blobsMaxSpeed);
@@ -575,7 +575,7 @@ bool World::mergeBlobs(Blob& blob1, Blob& blob2, const double randomJiggleLimmit
 
     blob1.setPointingDirection( ( fbA 
                                  + sbA 
-                                 + generateRandomNumber((unsigned) fabs(randomJiggleLimmit))
+                                 + generateRandomNumber(fabs(randomJiggleLimmit))
                                 ) / 3);
 
     return true;

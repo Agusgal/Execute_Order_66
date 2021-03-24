@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib> /* srand(), rand() */
 #include <ctime> /* time() */
+#include <cmath>
 #include "randomGenerators.h"
 
 /******************** DEFINITIONS ********************/
@@ -9,23 +10,35 @@
 
 /******************** PROTOTYPES ********************/
 static long int ipow(unsigned int base, unsigned int exponent);
-static double generateRandomDouble(int max, unsigned int precision = MINIMUM_PRECISION);
+static double generateRandomDouble(unsigned long int max, unsigned int precision = MINIMUM_PRECISION);
 
 /******************** PUBLIC FUNCTIONS ********************/
 void
 initRandom(void) {
-    srand((unsigned int) time(NULL));
+    srand(((unsigned int) time(NULL)) * ((unsigned int) clock()));
     return;
 }
 
 double
-generateRandomNumber(unsigned int maximum, unsigned int precision) {
-    if (maximum == 0) {
-        std::cout << "Invalid maximum value: 0" << std::endl;
+generateRandomNumber(double maximum, unsigned int originalPrecision) {
+    if (islessequal(maximum, 0.0)) {
+        std::cout << "randomGenerators -> generateRandomNumber: Invalid maximum value." << std::endl;
         return 0.0;
     }
-
-    return generateRandomDouble(maximum, precision);
+    double intPart = 0, decPart = 0, intPartMax = 0, decPartMax = 0; //Integer part (variable), decimal part (variable), integer part of maximum number, decimal part of maximum number
+    unsigned long int aux1 = (unsigned long int) (maximum * ipow(10, originalPrecision)); //Convert maximum to unsigned long int without decimal separator
+    aux1 -= (aux1 % ipow(10, originalPrecision)); //Substract to leave only the integer part of the maximum number
+    aux1 = aux1 / ipow(10, originalPrecision); //Divide by (10 times the number of decimal digits) to get the integer part of the maximum number
+    intPartMax = (double)aux1; //Convert to double to get intPartMax value
+    decPartMax = maximum - intPartMax; //Substract to get decPartMax value. This will result in the random number not having decimal part if _maximum_ is an integer
+    intPart = generateRandomDouble((unsigned long) intPartMax, 0); //Generate a random integer part for the random number
+    if ((maximum - intPart) >= 1) //If _maximum_ is an integer or (maximum - intPart) is greater than one, this allows to get a decimal value from 0 to 1. Because of this, the returned
+                                    //number is able to be equal to _maximum_
+        decPart = generateRandomDouble(ipow(10, originalPrecision), 0);
+    else    //If (minimum - intPart) is less than 1, restrict the decimal part to the original value. This allows non-integers to have decimal part
+        decPart = generateRandomDouble(((unsigned long)decPartMax) * ipow(10, originalPrecision), 0);
+    decPart /= ipow(10, originalPrecision); //Divide to convert to decimal
+    return (intPart + decPart); //Then the random number is the sum of the integer part and the decimal part
 }
 
 double
@@ -35,7 +48,7 @@ generateRandomAngle(unsigned int precision) {
 
 /******************** STATIC FUNCTIONS ********************/
 static double
-generateRandomDouble(int max, unsigned int precision) {
+generateRandomDouble(unsigned long int max, unsigned int precision) {
     // Generate two random numbers:
     // .- Integer part ( 0 <= integer < max)
     // .- Decimal part ( 0 <= decimal < 10^(precision) )
@@ -51,7 +64,6 @@ generateRandomDouble(int max, unsigned int precision) {
     // (math lib's pow() uses doubles... seems overkill)
     // Just in case, we take the absolute value of _precision_.
     int decimal = rand() % ipow(10, precision);
-
     // Integer part + decimal part 
     return (double)(integer + (((double)decimal) / ipow(10, precision)));
 }

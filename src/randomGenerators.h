@@ -35,7 +35,7 @@ void initRandom(void);
  * Returns:
  *  Number between 0 and maximum with _precision_ decimals:a
  */
-double generateRandomNumber(unsigned int maximum, unsigned int precision = MINIMUM_PRECISION);
+double generateRandomNumber(double maximum, unsigned int precision = MINIMUM_PRECISION);
 
 /*
  * Generate a random angle in range 0.0 <= angle < 360.0.

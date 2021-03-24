@@ -516,8 +516,17 @@ int Gui::configureImGui(void) {
 
 
 int Gui::loadBitmaps(void) {
-
+    
     background = al_load_bitmap("..\\res\\background.jpg");
+    std::cout << background << std::endl;;
+    background = al_load_bitmap("res\\background.jpg");
+    std::cout << background << std::endl;;
+    background = al_load_bitmap("..\\..\\res\\background.jpg");
+    std::cout << background << std::endl;;
+
+    background = al_load_bitmap("background.jpg");
+    std::cout << background << std::endl;;
+
     if (!background){
         fprintf(stderr, "Failed to load background bitmap!\n");
         return -1;

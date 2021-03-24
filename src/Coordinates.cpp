@@ -53,8 +53,8 @@ Coordinates::Coordinates(double maxX, double maxY) {
     this->maximumCoordinates.y = maxY;
 
     // TODO: Handle floating point in random number generation
-    this->position.x = generateRandomNumber((unsigned)this->maximumCoordinates.x);
-    this->position.y = generateRandomNumber((unsigned)this->maximumCoordinates.y);
+    this->position.x = generateRandomNumber(this->maximumCoordinates.x);
+    this->position.y = generateRandomNumber(this->maximumCoordinates.y);
     angle = generateRandomAngle();
     
     return;
