@@ -524,31 +524,31 @@ int Gui::configureImGui(void) {
 
 int Gui::loadBitmaps(void) {
    
-    background = al_load_bitmap("C:\\Users\\Agus\\source\\repos\\Agusgal\\Execute_Order_66\\res\\background.jpg");
+    background = al_load_bitmap("res\\background.jpg");
     if (!background){
         fprintf(stderr, "Failed to load background bitmap!\n");
         return -1;
     }
     
-    babyBlob = al_load_bitmap("C:\\Users\\Agus\\source\\repos\\Agusgal\\Execute_Order_66\\res\\babyblob.png");
+    babyBlob = al_load_bitmap("res\\babyblob.png");
     if (!babyBlob) {
         fprintf(stderr, "Failed to create babyBlob bitmpap!\n");
         return -1;
     }
     
-    goodOldBlob = al_load_bitmap("C:\\Users\\Agus\\source\\repos\\Agusgal\\Execute_Order_66\\res\\goodoldblob.png");
+    goodOldBlob = al_load_bitmap("res\\goodoldblob.png");
     if (!goodOldBlob) {
         fprintf(stderr, "Failed to create goodOldBlob bitmpap!\n");
         return -1;
     }
     
-    grownBlob = al_load_bitmap("C:\\Users\\Agus\\source\\repos\\Agusgal\\Execute_Order_66\\res\\grownblob.png");
+    grownBlob = al_load_bitmap("res\\grownblob.png");
     if (!grownBlob) {
         fprintf(stderr, "Failed to create grownBlob bitmpap!\n");
         return -1;
     }
     
-    food = al_load_bitmap("C:\\Users\\Agus\\source\\repos\\Agusgal\\Execute_Order_66\\res\\food.png");
+    food = al_load_bitmap("res\\food.png");
     if (!food) {
         fprintf(stderr, "Failed to create food bitmap!\n");
         return -1;
