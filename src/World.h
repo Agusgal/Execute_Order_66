@@ -29,7 +29,9 @@ public:
     void destroy(void);
 
     /*
-     * 
+     * Returns:
+     *  True: Simulation can go on.
+     *  False: Simulation must stop.
      */
     bool worldTick(const double randomJiggleLimit);
 
