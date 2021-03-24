@@ -76,6 +76,11 @@ public:
      */
     bool setDeathChance(const int age, const double newChance);
     bool setSmellRadius(const int age, const double newRadius);
+    
+    void setMaxSpeed(int speed);
+    void setRelativeSpeed(float speed);
+    void setJiggle(int jiggle);
+
 
 private:
     SDLL* blobsList;
@@ -91,7 +96,11 @@ private:
      */
     double blobsDeathChance[NBLOBS];
     double blobsSmellRadius[NBLOBS];
-    double blobsMaxSpeed;
+    int blobsMaxSpeed;
+    int jiggle;
+    int relativeSpeed;
+
+
     bool blobsMaxSpeedIsRnd;
     Size_t blobsSize[NBLOBS];
 
@@ -101,6 +110,8 @@ private:
     void initializeFood(Food* food); // Call this after creation
 
     void updateFood(Food& food); // Make a piece of food change its coordinates
+
+
 
 
     SDLL_Node* findBlobNode(Blob* blob);

@@ -2,10 +2,8 @@
 
 
 Gui::Gui() {
-    showMainGuiWindow = true;
-    showRunningGuiWindow = false;
-
     runningInitial = true;
+    runningMain = false;
 
     noError = true;
 
@@ -39,6 +37,7 @@ Gui::Gui() {
 
 int Gui::showInitialWindow(void) {
 
+    int out = 0;
     init();
 
     al_set_new_display_flags(ALLEGRO_RESIZABLE);
@@ -94,6 +93,7 @@ int Gui::showInitialWindow(void) {
 
                 if (initialWindow()) {
                     runningInitial = false;
+                    runningMain = true;
                 }
 
                 ImGui::Render();	
@@ -120,7 +120,7 @@ int Gui::showInitialWindow(void) {
     //al_destroy_display(display);
     //al_shutdown_primitives_addon();
    
-    return 0;
+    return out;
 }
 
 int Gui::showMainWindow(World& sim) {//end esarrollo
@@ -245,30 +245,24 @@ int Gui::initialWindow(void) {
         
         if (checkData()) {
             noError = false;
-        }  
+        }
+        else {
+            noError = true;
+           //Sigo al programa principal
+            out = -1;
+        }
     }
-    else {
-        noError = true;
-        //Puedo seguir al programa principal
-    }
+    
     
     if (!noError) {
         ImGui::OpenPopup("error");
         popupOpen = true;
+        noError = true;
     }
     if (popupOpen) {
         popup(errorType.c_str());
     }
     
-    
-    
-    
-    
-
-    //popup(errorType.c_str());
-    //if(!noError){
-     //   popup(errorType.c_str());
-    //}
 
 #ifdef DEBUG_GUI
     ImGuiIO& io = ImGui::GetIO();
@@ -347,6 +341,11 @@ int Gui::mainWindow(void) {
     return 0;
 }
 
+void Gui::setInitialData(World& sim) {
+//Seteo la data inicial de la simulacion
+
+    sim.
+}
 
 
 int Gui::init(void) {

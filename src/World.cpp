@@ -366,6 +366,18 @@ bool World::setSmellRadius(const int age, const double newRadius) {
     return true;
 }
 
+void World::setMaxSpeed(int speed) {
+    blobsMaxSpeed = speed;
+}
+
+void World::setRelativeSpeed(float speed) {
+    relativeSpeed = speed;
+}
+
+void World::setJiggle(int jiggle) {
+    this->jiggle = jiggle;
+}
+
 
 /******************** PRIVATE METHODS ********************/
 bool World::createBlob(void) {

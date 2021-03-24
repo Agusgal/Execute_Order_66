@@ -19,8 +19,7 @@ class Gui {
 public:
     Gui();
 
-    bool showMainGuiWindow;
-    bool showRunningGuiWindow;
+   
 
     //Ventanas Gui
     int initialWindow(void);
@@ -55,6 +54,10 @@ public:
     float getDead(int type);
     float getSmellRadius(void);
     float getJiggle(void);
+
+
+    void setInitialData(World &sim);
+    void setData(World& sim);
 
 private:
 
@@ -93,7 +96,7 @@ private:
     int displaySizeY;
 
     bool runningInitial;
-    bool runningMain; 
+    bool runningMain;
     bool closeWindow;
 
     double simTpS;
