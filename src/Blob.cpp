@@ -68,6 +68,12 @@ Blob::Blob(Point_t& maxCoordinates)
     this->smellRadius = 0;
     this->dimensions = { 0 };
 
+#ifdef DEBUG
+    const Point_t* cPos = this->currentPosition.getPosition();
+    double ang = this->currentPosition.getAngle();
+    std::cout << "Blob in: (" << cPos->x << ", " << cPos->y << ") a = " << ang << std::endl;
+#endif
+
     return;
 }
 /******************** PUBLIC METHODS ********************/
