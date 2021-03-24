@@ -376,7 +376,7 @@ void World::setMaxSpeed(double speed) {
         current != NULL; current = current->getNextNode()) {
         
         if (this->blobsMaxSpeedIsRnd) {
-            current->getData()->blob->setMaximumSpeed(generateRandomNumber(this->blobsMaxSpeed));
+            current->getData()->blob->setMaximumSpeed(generateRandomNumber((unsigned) this->blobsMaxSpeed));
         }
         else {
             current->getData()->blob->setMaximumSpeed(this->blobsMaxSpeed);

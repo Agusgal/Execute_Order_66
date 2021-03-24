@@ -84,7 +84,7 @@ private:
     SDLL* blobsList;
     SDLL* foodList;
 
-    int foodAvailable; // Ammount of food
+    unsigned foodAvailable; // Ammount of food
     unsigned aliveBlobs;    // How many blobs are alive
 
     Size_t dimensions;           // World dimensions
