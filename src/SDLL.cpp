@@ -29,6 +29,7 @@ SDLL_Node::SDLL_Node(int dataType, Point_t& maxCoordinates,
                     << std::endl;
                 return;
             }
+            this->type = SDLL_DT_BLOB;
             break;
 
         case SDLL_DT_FOOD:
@@ -39,6 +40,7 @@ SDLL_Node::SDLL_Node(int dataType, Point_t& maxCoordinates,
                     << std::endl;
                 return;
             }
+            this->type = SDLL_DT_FOOD;
 
             break;
 
@@ -229,10 +231,27 @@ bool SDLL::remove(SDLL_Node* node) {
             << std::endl;
         return false;
     }
+    
+    if (removeHead == false) {
+        // Remove pointers to this node from list
+        SDLL_Node* currentPrev = node->getPrevNode();
+        SDLL_Node* currentNext = node->getNextNode();
 
-    // Remove pointers to this node from list
-    node->getPrevNode()->setNextNode(node->getNextNode());
-    node->getNextNode()->setPrevNode(node->getPrevNode());
+        if (currentPrev != NULL) {
+            currentPrev->setNextNode(node->getNextNode());
+        }
+        else {
+            this->head = currentNext; // Prev was NULL --> we're removing head
+        }
+
+
+        if (currentNext != NULL) {
+            currentNext->setPrevNode(node->getPrevNode());
+        }
+        else {
+            this->tail = currentPrev; // Next was NULL --> we're removing tail
+        }
+    }
 
     // Destroy node
     if (node->destroy() == true) {
