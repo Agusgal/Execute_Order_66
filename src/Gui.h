@@ -106,6 +106,8 @@ private:
     double simTpS;
     double fps; 
 
+    int backgroundSize;
+
     World* sim;
 };
 

@@ -21,7 +21,7 @@ Gui::Gui() {
     simTimer = NULL;
     flipTimer = NULL;
     fps = 120;
-    simTpS = 2;
+    simTpS = 30;
     displaySizeX = 1280;
     displaySizeY = 720;
 
@@ -172,7 +172,7 @@ int Gui::showMainWindow(void) {//end esarrollo
             
                 ImGui_ImplAllegro5_NewFrame();
                 ImGui::NewFrame();
-                ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+                ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
 
 
                 if(mainWindow()) {
@@ -230,7 +230,7 @@ int Gui::initialWindow(void) {
     if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 
-    ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, 260), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
+    ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, 300), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
 
     ImGui::Begin("Configure Simulation", NULL, window_flags);
 
@@ -295,13 +295,13 @@ int Gui::initialWindow(void) {
 
 int Gui::mainWindow(void) {
 
-    static bool NoTitlebar = true;
+    static bool NoTitlebar = false;
     static bool NoMenu = true;
-    static bool NoCollapse = true;
-    static bool NoResize = true;
-    static bool NoMove = true;
+    static bool NoCollapse = false;
+    static bool NoResize = false;
+    static bool NoMove = false;
     static bool NoClose = true;
-    static bool NoBackground = true;
+    static bool NoBackground = false;
     static bool NoScrollbar = true;
     static bool no_bring_to_front = false;
 
@@ -316,13 +316,12 @@ int Gui::mainWindow(void) {
     if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 
-    ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, 260), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
+    ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, 300), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
 
     ImGui::Begin("Configure Simulation2", NULL, window_flags);
 
     ImGui::SliderFloat("Relative speed", &relativeSpeed, 0.0f, 1.0f, "speed ratio = %.3f");
 
-    ImGui::SameLine();
     ImGui::SliderFloat("Max blob speed", &maxSpeed, 1, 30);
     ImGui::SameLine(); helpMarker("contrl + click to enter value, must not exceed 50 pixels per tick");
 
@@ -676,7 +675,7 @@ int Gui::drawFood(void) {
 
 int Gui::drawBackground(void) {
 
-    al_draw_scaled_bitmap(background, 0.0f, 0.0f, al_get_bitmap_width(background), al_get_bitmap_height(background), 0, 250, displaySizeX, displaySizeY, 0);
+    al_draw_scaled_bitmap(background, 0.0f, 0.0f, al_get_bitmap_width(background), al_get_bitmap_height(background), 0, 0, displaySizeX, displaySizeY, 0);
     return 0;
 }
 
