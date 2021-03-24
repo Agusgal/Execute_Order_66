@@ -378,6 +378,10 @@ void World::setJiggle(int jiggle) {
     this->jiggle = jiggle;
 }
 
+void World::setFoodCount(int food){
+    foodAvailable = food;
+}
+
 
 /******************** PRIVATE METHODS ********************/
 bool World::createBlob(void) {

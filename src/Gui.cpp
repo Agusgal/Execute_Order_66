@@ -344,7 +344,16 @@ int Gui::mainWindow(void) {
 void Gui::setInitialData(World& sim) {
 //Seteo la data inicial de la simulacion
 
-    sim.
+    sim.setMaxSpeed(maxSpeed);
+    sim.setJiggle(jiggleLimit);
+    sim.setFoodCount(foodCount);
+    sim.setRelativeSpeed(relativeSpeed);
+    sim.setSmellRadius();
+
+    sim.setDeathChance(BABYBLOB, deathProbability[BABYBLOB]);
+    sim.setDeathChance(GROWNBLOB, deathProbability[GROWNBLOB]);
+    sim.setDeathChance(GOODOLDBLOB, deathProbability[GOODOLDBLOB]);
+
 }
 
 

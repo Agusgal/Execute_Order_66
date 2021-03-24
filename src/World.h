@@ -80,13 +80,13 @@ public:
     void setMaxSpeed(int speed);
     void setRelativeSpeed(float speed);
     void setJiggle(int jiggle);
-
+    void setFoodCount(int food);
 
 private:
     SDLL* blobsList;
     SDLL* foodList;
 
-    unsigned foodAvailable; // Ammount of food
+    int foodAvailable; // Ammount of food
     unsigned aliveBlobs;    // How many blobs are alive
 
     Size_t dimensions;           // World dimensions
