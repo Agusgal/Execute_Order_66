@@ -3,11 +3,6 @@
 
 #include <string>
 
-typedef struct Size
-{
-    double width;
-    double height;
-}Size_t;
 
 class Sprite {
 public:

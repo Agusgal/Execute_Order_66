@@ -2,7 +2,6 @@
 #define BLOB_H  1
 
 #include "Coordinates.h"
-#include "Sprite.h"
 
 enum blobAge {
     BABYBLOB = 0,

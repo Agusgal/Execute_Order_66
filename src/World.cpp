@@ -366,20 +366,50 @@ bool World::setSmellRadius(const int age, const double newRadius) {
     return true;
 }
 
-void World::setMaxSpeed(int speed) {
-    blobsMaxSpeed = speed;
+void World::setMaxSpeed(double speed) {
+    if (isless(speed, 0.0)) {
+        std::cout << "Maximum speed must be greater than 0" << std::endl;
+        return;
+    }
+    this->blobsMaxSpeed = speed;
+    for (SDLL_Node* current = this->blobsList->getHead();
+        current != NULL; current = current->getNextNode()) {
+        
+        if (this->blobsMaxSpeedIsRnd) {
+            current->getData()->blob->setMaximumSpeed(generateRandomNumber(this->blobsMaxSpeed));
+        }
+        else {
+            current->getData()->blob->setMaximumSpeed(this->blobsMaxSpeed);
+        }
+    }
 }
 
-void World::setRelativeSpeed(float speed) {
-    relativeSpeed = speed;
+void World::setRelativeSpeed(double speed) {
+    if (isless(speed, 0.0)) {
+        std::cout << "Relative speed must be greater than 0" << std::endl;
+        return;
+    }
+    this->blobsRelativeSpeed = speed;
 }
 
-void World::setJiggle(int jiggle) {
-    this->jiggle = jiggle;
-}
+void World::setFoodCount(unsigned food) {
+    if (food == 0) {
+        std::cout << "Food must be greater than 0" << std::endl;
+        return;
+    }
 
-void World::setFoodCount(int food){
-    foodAvailable = food;
+    while (food != this->foodAvailable) {
+        if (food < this->foodAvailable) {
+            this->foodList->pop();
+            this->foodAvailable--;
+        }
+        else if (food > this->foodAvailable) {
+            this->foodList->append();
+            this->foodAvailable++;
+        }
+    }
+
+    return;
 }
 
 

@@ -3,7 +3,6 @@
 
 #include "SDLL.h"
 #include "Blob.h"
-#include "Sprite.h"
 
 class World {
 public:
@@ -77,10 +76,9 @@ public:
     bool setDeathChance(const int age, const double newChance);
     bool setSmellRadius(const int age, const double newRadius);
     
-    void setMaxSpeed(int speed);
-    void setRelativeSpeed(float speed);
-    void setJiggle(int jiggle);
-    void setFoodCount(int food);
+    void setMaxSpeed(double speed);
+    void setRelativeSpeed(double speed);
+    void setFoodCount(unsigned food);
 
 private:
     SDLL* blobsList;
@@ -96,12 +94,12 @@ private:
      */
     double blobsDeathChance[NBLOBS];
     double blobsSmellRadius[NBLOBS];
-    int blobsMaxSpeed;
-    int jiggle;
-    int relativeSpeed;
-
 
     bool blobsMaxSpeedIsRnd;
+    double blobsMaxSpeed;
+    double blobsRelativeSpeed;
+
+
     Size_t blobsSize[NBLOBS];
 
     bool createBlob(void);

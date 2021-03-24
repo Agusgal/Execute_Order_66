@@ -1,0 +1,4 @@
+C:\Users\Martin\Documents\Universidad\2208-EDA\TP3\source\Debug-Testing\Execute Order 66.vcxproj.CopyComplete
+C:\Users\Martin\Documents\Universidad\2208-EDA\TP3\source\Debug-Testing\Execute Order 66.exe
+C:\Users\Martin\Documents\Universidad\2208-EDA\TP3\source\Debug-Testing\allegro-debug-5.2.dll
+C:\Users\Martin\Documents\Universidad\2208-EDA\TP3\source\Debug-Testing\allegro_primitives-debug-5.2.dll

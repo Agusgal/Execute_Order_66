@@ -6,6 +6,12 @@ typedef struct Point {
     double y;
 } Point_t;
 
+typedef struct Size
+{
+    double width;
+    double height;
+} Size_t;
+
 class Coordinates {
 public:
     /* X, Y and angle are initialized to 0.0 */
