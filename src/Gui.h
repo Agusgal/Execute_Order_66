@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <string>
 
 #include "../lib/ImGui/imgui.h"
 #include "../lib/ImGui/imgui_impl_allegro5.h"
@@ -10,7 +11,9 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
 
-#define DEBUG_GUI 1
+#include "World.h"
+
+//#define DEBUG_GUI 
 
 class Gui {
 public:
@@ -22,10 +25,11 @@ public:
     //Ventanas Gui
     int initialWindow(void);
     int mainWindow(void);
-    static void helpMarker(const char* desc);
-    
-    int initialGraph(void); //Debe recibir sym creo
-    int mainGraph(void);
+    void helpMarker(const char* desc);
+    void popup(const char* msg);
+
+    int showInitialWindow(void); //Debe recibir sym creo
+    int showMainWindow(World &sim);
 
     int loadBitmaps(void);
 
@@ -34,12 +38,23 @@ public:
     int configureEvents(void);
     int configureImGui(void);
 
+    int checkData(void);
     int parseData(void);
 
-    int drawBlobs(void);
-    int drawFood(void);
+    int drawBlobs(World &sim);
+    int drawFood(World &sim);
+    int drawBackground(World& sim);
 
     bool getClose(void);
+
+    int getMode(void);
+    int getBlobNum(void);
+    int getFoodCount(void);
+    float getMaxSpeed(void);
+    float getRelativeSpeed(void);
+    float getDead(int type);
+    float getSmellRadius(void);
+    float getJiggle(void);
 
 private:
 
@@ -52,6 +67,9 @@ private:
     float jiggleLimit;
     float deathProbability[3];
     int foodCount;
+    
+    std::string errorType;
+    bool noError;
     
     //ImGui
 
