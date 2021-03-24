@@ -285,4 +285,9 @@ bool Blob::setSmellRadius(double radius) {
     this->smellRadius = radius;
     return true;
 }
+
+void Blob::setAwayFromBlob(double x, double y) {
+    this->currentPosition.displace(x, y);
+}
+
 /******************** PRIVATE METHODS ********************/

@@ -29,6 +29,7 @@ public:
     const Point_t* getPosition(void);
     void getAngle(double&);
     double getAngle();
+    void displace(double x, double y);
 
 private:
     Point_t position;

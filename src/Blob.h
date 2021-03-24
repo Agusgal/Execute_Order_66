@@ -53,6 +53,7 @@ public:
     bool setPointingDirection(double x, double y); // Angle will be calculated to make blob point towards x and y
     bool setMaximumSpeed(double newMaxSpeed);
     bool setSmellRadius(double radius);
+    void setAwayFromBlob(double x, double y);
 
 private:
     unsigned age;

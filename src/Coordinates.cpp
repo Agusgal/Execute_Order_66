@@ -202,4 +202,10 @@ double Coordinates::getAngle(void) {
     return this->angle;
 }
 
+void Coordinates::displace(double x, double y) {
+    this->position.x += x;
+    this->position.y += y;
+    this->update(1.0);
+}
+
 /******************** PRIVATE METHODS ********************/

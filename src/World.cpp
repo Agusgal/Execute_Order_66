@@ -221,9 +221,14 @@ bool World::worldTick(const float randomJiggleLimit) {
     this->checkMerge(randomJiggleLimit);
     this->checkFood();
 
-    for (SDLL_Node* curr = blobsList->getHead(); curr != NULL; curr = curr->getNextNode()) {
-        if (curr == NULL) break;
-        john = curr->getData()->blob;
+    SDLL_Node* current = NULL;
+    SDLL_Node* next = NULL;
+
+    for (current = this->blobsList->getHead(); current != NULL; current = next) {
+        if (current == NULL) break;
+
+        next = current->getNextNode(); // This will avoid derreferencing an invalid address if this blob dies
+        john = current->getData()->blob;
 
         if (!blobsDeath(*john)) {
             john->move(tickSpeed);
@@ -297,7 +302,7 @@ bool World::checkMerge(const float randomJiggleLimit) {
 
         for (SDLL_Node * secondaryNode = mainNode->getNextNode();
             secondaryNode != NULL;
-            secondaryNode->getNextNode()) {
+            secondaryNode = secondaryNode->getNextNode()) {
 
             Blob* secondaryBlob = secondaryNode->getData()->blob;
             if (secondaryBlob == NULL) {
@@ -588,6 +593,10 @@ bool World::eatAndReproduce(Blob& blob) {
     // blob must be born.
     if (newBirdth == true) {
         this->createBlob();
+        
+        double x = 0, y = 0, angle = 0;
+        blob.getCoordinates(x, y, angle);
+        this->blobsList->getTail()->getData()->blob->setAwayFromBlob(x, y);
     }
     return newBirdth;
 }
