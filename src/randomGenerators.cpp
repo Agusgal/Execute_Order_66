@@ -81,9 +81,11 @@ ipow(unsigned int base, unsigned int exponent) {
     if (base == 1) {
         return 1;
     }
-
-    if (base == 0) {
+    else if (base == 0) {
         return 0;
+    }
+    else if (exponent == 0) {
+        return 1;
     }
 
     int result = 1;
