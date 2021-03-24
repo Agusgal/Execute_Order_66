@@ -16,10 +16,10 @@ long double distance(Point_t& firstPoint, Point_t& secondPoint);
 World::World(
     int worldMode,
     double worldWidth, double worldHeight,
-    unsigned blobsNumber, unsigned foodAmmount,
+    int blobsNumber, int foodAmmount,
     Size_t blobSizeByAge[NBLOBS],
-    double deathChance[NBLOBS], double smellRadius[NBLOBS],
-    double blobsMaximumSpeed) {
+    float deathChance[NBLOBS], float smellRadius[NBLOBS],
+    float blobsMaximumSpeed) {
     // Initialize everything 
     this->mode = MODE_INVALID;
     this->blobsList = NULL;
@@ -50,13 +50,13 @@ World::World(
             << std::endl;
         return;
     }
-    else if (blobsNumber == 0) {
+    else if (blobsNumber <= 0) {
         std::cout
             << "Evolution cannot happen without any blobs!"
             << std::endl;
         return;
     }
-    else if (foodAmmount == 0) {
+    else if (foodAmmount <= 0) {
         std::cout
             << "No food => No growing => No reproduction => No evolution"
             << std::endl;
@@ -104,10 +104,10 @@ World::World(
 
     this->blobsMaxSpeed = blobsMaximumSpeed;
     switch (this->mode) {
-        MODE_ONE:
+        case MODE_ONE:
             this->blobsMaxSpeedIsRnd = false;
             break;
-        MODE_TWO:
+        case MODE_TWO:
             this->blobsMaxSpeedIsRnd = true;
             break;
         default:
@@ -140,7 +140,7 @@ World::World(
     this->initializeFood(this->foodList->getTail()->getData()->food);
 
     // Generate the desired blobs and food
-    for (unsigned int i = this->aliveBlobs; i < blobsNumber; i++) {
+    for (int i = this->aliveBlobs; i < blobsNumber; i++) {
         if (this->createBlob() == false) {
             std::cout
                 << "Unable to create a new blob. Aborting."
@@ -149,7 +149,7 @@ World::World(
         }
     }
 
-    for (unsigned int i = this->foodAvailable; i < foodAmmount; i++) {
+    for (int i = this->foodAvailable; i < foodAmmount; i++) {
         if (this->createFood() == false) {
             std::cout
                 << "Unable to create new food. Aborting."
@@ -182,13 +182,11 @@ void World::destroy(void) {
     return;
 }
 
-bool World::worldTick(const double randomJiggleLimit) {
-    bool success = false;
-
+bool World::worldTick(const float randomJiggleLimit) {
     double tickSpeed = 0;
 
     switch (this->mode) {
-        MODE_ONE:
+        case MODE_ONE:
         /*
         En el modo 1 los blobs en todo momento comparten la misma velocidad. 
         El usuario setea la velocidad con dos valores:
@@ -200,37 +198,39 @@ bool World::worldTick(const double randomJiggleLimit) {
         velocidad porcentual.
         */
             tickSpeed = this->blobsMaxSpeed * this->blobsRelativeSpeed;
-            Blob* john = NULL;
-
-            this->checkFood();
-            this->checkMerge(randomJiggleLimit);
-
-            for (SDLL_Node* curr = blobsList->getHead(); curr != NULL; curr = curr->getNextNode()) {
-                if (curr == NULL) break;
-                john = curr->getData()->blob;
-
-                if (!blobsDeath(*john)) {
-                    john->move(tickSpeed);
-                }
-            }
             break;
 
-        MODE_TWO:
+        case MODE_TWO:
         /*
         En el modo 2, cada blob tiene una velocidad máxima distinta a la de los 
         demás. Estas se eligen aleatoriamente entre 0 y un valor máximo elegido 
         por el usuario antes de que inicie la simulación. 
         Todos los blobs comparten la velocidad porcentual.
         */
+
+            tickSpeed = this->blobsRelativeSpeed;
             break;
 
         default:
             std::cout << "Invalid game mode. Unable to proceed." << std::endl;
-            success = false;
+            return false;
             break;
     }
+    Blob* john = NULL;
 
-    return success;
+    this->checkMerge(randomJiggleLimit);
+    this->checkFood();
+
+    for (SDLL_Node* curr = blobsList->getHead(); curr != NULL; curr = curr->getNextNode()) {
+        if (curr == NULL) break;
+        john = curr->getData()->blob;
+
+        if (!blobsDeath(*john)) {
+            john->move(tickSpeed);
+        }
+    }
+
+    return this->status();
 }
 
 bool World::checkFood(void) {
@@ -276,7 +276,7 @@ bool World::blobsDeath(Blob& blob) {
     return aBlobHasDied;
 }
 
-bool World::checkMerge(const double randomJiggleLimit) {
+bool World::checkMerge(const float randomJiggleLimit) {
     bool atLeastOneMerge = false;
 
     // Store the current tail's address so newly born blobs (appended to the list)
@@ -392,7 +392,7 @@ Food* World::getNextFood(Food* lastFood) {
 }
 
 
-bool World::setDeathChance(const int age, const double newChance) {
+bool World::setDeathChance(const int age, const float newChance) {
     if (age < BABYBLOB || age > GOODOLDBLOB) {
         std::cout 
             << "Unable to set death chance of an invalid age."
@@ -413,7 +413,7 @@ bool World::setDeathChance(const int age, const double newChance) {
     return true;
 }
 
-bool World::setSmellRadius(const int age, const double newRadius) {
+bool World::setSmellRadius(const int age, const float newRadius) {
     if (age < BABYBLOB || age > GOODOLDBLOB) {
         std::cout 
             << "Unable to set smell radius of an invalid age."
@@ -434,7 +434,7 @@ bool World::setSmellRadius(const int age, const double newRadius) {
     return true;
 }
 
-void World::setMaxSpeed(double speed) {
+void World::setMaxSpeed(float speed) {
     if (isless(speed, 0.0)) {
         std::cout << "Maximum speed must be greater than 0" << std::endl;
         return;
@@ -452,7 +452,7 @@ void World::setMaxSpeed(double speed) {
     }
 }
 
-void World::setRelativeSpeed(double speed) {
+void World::setRelativeSpeed(float speed) {
     if (isless(speed, 0.0)) {
         std::cout << "Relative speed must be greater than 0" << std::endl;
         return;
@@ -460,18 +460,18 @@ void World::setRelativeSpeed(double speed) {
     this->blobsRelativeSpeed = speed;
 }
 
-void World::setFoodCount(unsigned food) {
-    if (food == 0) {
+void World::setFoodCount(int food) {
+    if (food <= 0) {
         std::cout << "Food must be greater than 0" << std::endl;
         return;
     }
 
-    while (food != this->foodAvailable) {
-        if (food < this->foodAvailable) {
+    while (food != (int)this->foodAvailable) {
+        if (food < (int)this->foodAvailable) {
             this->foodList->pop();
             this->foodAvailable--;
         }
-        else if (food > this->foodAvailable) {
+        else if (food > (int)this->foodAvailable) {
             this->foodList->append();
             this->foodAvailable++;
         }

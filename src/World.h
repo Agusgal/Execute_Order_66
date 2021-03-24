@@ -16,10 +16,10 @@ public:
     World(
         int worldMode,
         double width, double height,
-        unsigned blobsNumber, unsigned foodAmmount, 
+        int blobsNumber, int foodAmmount, 
         Size_t blobSizeByAge[NBLOBS],
-        double deathChance[NBLOBS], double smellRadius[NBLOBS],
-        double blobsMaximumSpeed
+        float deathChance[NBLOBS], float smellRadius[NBLOBS],
+        float blobsMaximumSpeed
     );
 
     /*
@@ -33,7 +33,7 @@ public:
      *  True: Simulation can go on.
      *  False: Simulation must stop.
      */
-    bool worldTick(const double randomJiggleLimit);
+    bool worldTick(const float randomJiggleLimit);
 
     /*
      * What are the odds? Will this blob die?
@@ -64,7 +64,7 @@ public:
      *  True: At least one pair of blob has been merged.
      *  False: No blob mergin happend.
      */
-    bool checkMerge(const double randomJiggleLimit);
+    bool checkMerge(const float randomJiggleLimit);
 
     /*
      * Tell if there's at least one blob still alive.
@@ -87,12 +87,12 @@ public:
     /*
      * Returns false on error.
      */
-    bool setDeathChance(const int age, const double newChance);
-    bool setSmellRadius(const int age, const double newRadius);
+    bool setDeathChance(const int age, const float newChance);
+    bool setSmellRadius(const int age, const float newRadius);
     
-    void setMaxSpeed(double speed);
-    void setRelativeSpeed(double speed);
-    void setFoodCount(unsigned food);
+    void setMaxSpeed(float speed);
+    void setRelativeSpeed(float speed);
+    void setFoodCount(int food);
 
 private:
     int mode;
