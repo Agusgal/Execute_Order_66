@@ -109,6 +109,8 @@ World::World(
             << std::endl;
         return;
     }
+    // Creating a new blob list generates an uninitialized blob
+    this->initializeBlob(this->blobsList->getTail()->getData()->blob);
 
     this->foodList = new SDLL(SDLL_DT_FOOD, worldMax);
     if (this->foodList == NULL) {
@@ -117,9 +119,11 @@ World::World(
             << std::endl;
         return;
     }
+    // Creating a new food list generates an uninitialized piece of food
+    this->initializeFood(this->foodList->getTail()->getData()->food);
 
     // Generate the desired blobs and food
-    for (unsigned int i = 0; i < blobsNumber; i++) {
+    for (unsigned int i = this->aliveBlobs; i < blobsNumber; i++) {
         if (this->createBlob() == false) {
             std::cout
                 << "Unable to create a new blob. Aborting."
@@ -128,7 +132,7 @@ World::World(
         }
     }
 
-    for (unsigned int i = 0; i < foodAmmount; i++) {
+    for (unsigned int i = this->foodAvailable; i < foodAmmount; i++) {
         if (this->createFood() == false) {
             std::cout
                 << "Unable to create new food. Aborting."
@@ -196,7 +200,7 @@ bool World::blobsDeath(Blob& blob) {
         return false;
     }
 
-    if (isless(blob.getDeadthChance(), generateRandomNumber(1))) {
+    if (isless(generateRandomNumber(1), blob.getDeadthChance())) {
         this->blobsList->remove(node);
         aBlobHasDied = true;
     }
@@ -372,26 +376,33 @@ bool World::createBlob(void) {
         return false;
     }
 
-    Blob* lastBlob = NULL;
 
     if (this->blobsList->append() == NULL) {
         return false;
     }
 
+    this->initializeBlob(this->blobsList->getTail()->getData()->blob);
+
+    return true;
+}
+
+void World::initializeBlob(Blob* blob) {
+    if (blob == NULL) { return; }
+
     // Initialize blob
-    lastBlob = this->blobsList->getTail()->getData()->blob;
-    lastBlob->setDimensions(this->blobsSize[BABYBLOB]);
-    lastBlob->setDeathChance(this->blobsDeathChance[BABYBLOB]);
-    lastBlob->setSmellRadius(this->blobsSmellRadius[BABYBLOB]);
+    blob->setDimensions(this->blobsSize[BABYBLOB]);
+    blob->setDeathChance(this->blobsDeathChance[BABYBLOB]);
+    blob->setSmellRadius(this->blobsSmellRadius[BABYBLOB]);
     if (this->blobsMaxSpeedIsRnd == true) {
-        lastBlob->setMaximumSpeed(generateRandomNumber((unsigned) this->blobsMaxSpeed));
+        blob->setMaximumSpeed(generateRandomNumber((unsigned) this->blobsMaxSpeed));
     }
     else {
-        lastBlob->setMaximumSpeed(this->blobsMaxSpeed);
+        blob->setMaximumSpeed(this->blobsMaxSpeed);
     }
 
     this->aliveBlobs++;
-    return true;
+
+    return;
 }
 
 bool World::createFood(void) {
@@ -406,8 +417,17 @@ bool World::createFood(void) {
         return false;
     }
 
-    this->foodAvailable++;
+    this->initializeFood(this->foodList->getTail()->getData()->food);
     return true;
+}
+
+/* For consistency with initializeBlob */
+void World::initializeFood(Food* food) {
+    if (food == NULL) { return; }
+
+    this->foodAvailable++;
+
+    return;
 }
 
 void World::updateFood(Food& food) {

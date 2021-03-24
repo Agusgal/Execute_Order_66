@@ -96,7 +96,10 @@ private:
     Size_t blobsSize[NBLOBS];
 
     bool createBlob(void);
+    void initializeBlob(Blob* blob); // Call this after creation
     bool createFood(void);
+    void initializeFood(Food* food); // Call this after creation
+
     void updateFood(Food& food); // Make a piece of food change its coordinates
 
 
