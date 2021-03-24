@@ -1,11 +1,20 @@
 #include "Gui.h"
 
-
 Gui::Gui() {
+    popupOpen = false;
+    grownBlob = NULL;
+    babyBlob = NULL;
+    goodOldBlob = NULL;
+    food = NULL;
+    ev = {0};
+    background = NULL;
+    closeWindow = false;
+
     runningInitial = true;
     runningMain = false;
 
     noError = true;
+    this->sim = NULL;
 
     display = NULL;
     queue = NULL;
@@ -23,7 +32,9 @@ Gui::Gui() {
     initialBlobCount = 0;
     relativeSpeed = 0;
     maxSpeed = 0;
-    smellRadius = 0;
+    smellRadius[0] = 0;
+    smellRadius[1] = 0;
+    smellRadius[2] = 0;
     jiggleLimit = 0;
     deathProbability[0] = 0;
     deathProbability[1] = 0;
@@ -123,7 +134,7 @@ int Gui::showInitialWindow(void) {
     return out;
 }
 
-int Gui::showMainWindow(World& sim) {//end esarrollo
+int Gui::showMainWindow(void) {//end esarrollo
 
     while (runningMain) {
 
@@ -144,9 +155,10 @@ int Gui::showMainWindow(World& sim) {//end esarrollo
             if (ev.type == ALLEGRO_EVENT_TIMER && ev.timer.source == simTimer) {
                 prueba++;
                 //aca simulo un tick 
-                //simulate()
-                //draw()
-                drawBackground(sim);
+                //sim.simulate()
+                drawBackground();
+                drawBlobs();
+                drawFood();
             }
             if (ev.type == ALLEGRO_EVENT_TIMER && ev.timer.source == flipTimer) {
             
@@ -172,17 +184,16 @@ int Gui::showMainWindow(World& sim) {//end esarrollo
                 al_flip_display(); 
             }
         }
-
-        // Cleanup final
-        ImGui_ImplAllegro5_Shutdown();
-        ImGui::DestroyContext();
-
-        al_destroy_event_queue(queue);
-        al_destroy_display(display);
-        al_shutdown_primitives_addon();
-
-        return 0;
     }
+
+    ImGui_ImplAllegro5_Shutdown();
+    ImGui::DestroyContext();
+
+    al_destroy_event_queue(queue);
+    al_destroy_display(display);
+    al_shutdown_primitives_addon();
+
+    return 0;
 }
 
 
@@ -211,12 +222,12 @@ int Gui::initialWindow(void) {
     if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 
-    ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, displaySizeY), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
+    ImGui::SetNextWindowSize(ImVec2(250, displaySizeY), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
 
     ImGui::Begin("Configure Simulation", NULL, window_flags);
 
 
-    const char* items[] = { "Mode 1", "Mode 2" };
+    const char* items[] = {"Mode 1", "Mode 2"};
     ImGui::Combo("Mode", &mode, items, IM_ARRAYSIZE(items)); //chequear modo simulacion 
 
     ImGui::InputInt("Blob number", &initialBlobCount);
@@ -224,11 +235,12 @@ int Gui::initialWindow(void) {
 
     ImGui::SliderFloat("Relative speed", &relativeSpeed, 0.0f, 1.0f, "speed ratio = %.3f");
 
-    ImGui::SliderInt("Max blob speed", &maxSpeed, 1, 30);
+    ImGui::SliderFloat("Max blob speed", &maxSpeed, 1.0f, 30.0f);
     ImGui::SameLine(); helpMarker("contrl + click to enter value, must not exceed 50 pixels per tick");
 
-    ImGui::InputInt("Smell Radius", &smellRadius);
+    ImGui::InputFloat("Smell Radius", &smellRadius[0]);//aca solo modifica el primero, hacer tres mas 
     ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
+
 
     ImGui::SliderAngle("Jiggle Limit", &jiggleLimit, 0.0f, 360.0f);
 
@@ -237,11 +249,11 @@ int Gui::initialWindow(void) {
     ImGui::SliderFloat("GrownBlob", &deathProbability[1], 0.01f, 0.99f, "P.death = %.3f");
 
     ImGui::SliderFloat("GoodOldBlob", &deathProbability[2], 0.01f, 0.99f, "P.death = %.3f");
-
+    
     ImGui::InputInt("Food count", &foodCount);
     ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
 
-    if (ImGui::Button("Start Simulation", ImVec2(guiWindowSizeX, 50))){
+    if (ImGui::Button("Start Simulation")){
         
         if (checkData()) {
             noError = false;
@@ -275,8 +287,6 @@ int Gui::initialWindow(void) {
 
 int Gui::mainWindow(void) {
 
-    int out = 0;//esto se retorna
-
     static bool NoTitlebar = true;
     static bool NoMenu = true;
     static bool NoCollapse = true;
@@ -304,10 +314,10 @@ int Gui::mainWindow(void) {
 
     ImGui::SliderFloat("Relative speed", &relativeSpeed, 0.0f, 1.0f, "speed ratio = %.3f");
 
-    ImGui::SliderInt("Max blob speed", &maxSpeed, 1, 30);
+    ImGui::SliderFloat("Max blob speed", &maxSpeed, 1, 30);
     ImGui::SameLine(); helpMarker("contrl + click to enter value, must not exceed 50 pixels per tick");
 
-    ImGui::InputInt("Smell Radius", &smellRadius);
+    ImGui::InputFloat("Smell Radius", &smellRadius[0]);//modifico solo el primero Todo: cambiar
     ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
 
     ImGui::SliderAngle("Jiggle Limit", &jiggleLimit, 0.0f, 360.0f);
@@ -335,25 +345,7 @@ int Gui::mainWindow(void) {
     ImGui::PopItemWidth();
 
     ImGui::End();
-    return out;
-
-
     return 0;
-}
-
-void Gui::setInitialData(World& sim) {
-//Seteo la data inicial de la simulacion
-
-    sim.setMaxSpeed(maxSpeed);
-    sim.setJiggle(jiggleLimit);
-    sim.setFoodCount(foodCount);
-    sim.setRelativeSpeed(relativeSpeed);
-    sim.setSmellRadius();
-
-    sim.setDeathChance(BABYBLOB, deathProbability[BABYBLOB]);
-    sim.setDeathChance(GROWNBLOB, deathProbability[GROWNBLOB]);
-    sim.setDeathChance(GOODOLDBLOB, deathProbability[GOODOLDBLOB]);
-
 }
 
 
@@ -379,6 +371,7 @@ int Gui::init(void) {
         return -1;
     }
    
+    loadBitmaps();
     return 0;
 }
  
@@ -386,7 +379,6 @@ int Gui::checkData() {
     
     //Control blobN
     if (initialBlobCount <= 0){
- 
         errorType = "The number of blobs must be greater than 0.";
         return -1;
     }
@@ -397,53 +389,53 @@ int Gui::checkData() {
 
     //Control relative speed
 
-    if(relativeSpeed < 0){
+    if(isless(relativeSpeed, 0.0)){
         errorType = "The simulation cant go back in time.";
         return -1;
     }
-    else if (relativeSpeed > 1) {
+    else if (isgreater(relativeSpeed, 1.0)) {
         errorType = "The simulation speed must be 1 or less.";
         return -1;
     }
     
     //Control max speed
-    if(maxSpeed > 30){
+    if(isgreater(maxSpeed, 30.0)){
         errorType = "The maximum blob speed is capped at 30 pixels per simulation tick";
         return -1;
     }
-    else if (maxSpeed <= 0) {
+    else if (islessequal(maxSpeed, 0.0)) {
         errorType = "The maximun blob speed must be greater than 0;";
         return -1;
     }
 
     //Control Smell Radius
-    if (smellRadius > 50) {
+    if (isgreater(smellRadius[0], 50.0)) {
         errorType = "SmellRadius cant be greater than 50 pixels.";
         return -1;
     }
-    else if (smellRadius <= 0) {
+    else if (islessequal(smellRadius[0], 0.0)){
         errorType = "SmellRadius must be positive.";
         return -1;
     }
 
     //Control jiggle
-    if (jiggleLimit > 360) {
+    if (isgreater(jiggleLimit, 360.0)) {
         errorType = "JiggleLimit must be less than 360 degrees.";
         return -1;
     }
-    else if (jiggleLimit < 0) {
+    else if (isless(jiggleLimit, 0.0)) {
         errorType = "JiggleLimit must be at least 0.";
         return -1;
     }
 
     //Control P muerte
     for (int i = 0; i < 3; i++) {
-        if (deathProbability[i] <= 0) {
+        if (islessequal(deathProbability[i], 0.0)) {
         
             errorType = "Blobs cant have a death probability less or equal to cero.";
             return -1;
         }
-        else if (deathProbability[i] >= 1) {
+        else if (isgreaterequal(deathProbability[i], 1.0)) {
             errorType = "Blobs cant have a death probability greater or equal to 1.";
             return -1;
         }
@@ -525,31 +517,31 @@ int Gui::configureImGui(void) {
 
 int Gui::loadBitmaps(void) {
 
-    background = al_load_bitmap("background.jpg");
+    background = al_load_bitmap("..\\res\\background.jpg");
     if (!background){
         fprintf(stderr, "Failed to load background bitmap!\n");
         return -1;
     }
     
-    babyBlob = al_load_bitmap("Blobs/babyblob.png");
+    babyBlob = al_load_bitmap("..\\res\\babyblob.png");
     if (!babyBlob) {
         fprintf(stderr, "Failed to create babyBlob bitmpap!\n");
         return -1;
     }
     
-    goodOldBlob = al_load_bitmap("Blobs/goodoldblob.png");
+    goodOldBlob = al_load_bitmap("..\\res\\goodoldblob.png");
     if (!goodOldBlob) {
         fprintf(stderr, "Failed to create goodOldBlob bitmpap!\n");
         return -1;
     }
     
-    grownBlob = al_load_bitmap("Blobs/grownblob.png");
+    grownBlob = al_load_bitmap("..\\res\\grownblob.png");
     if (!grownBlob) {
         fprintf(stderr, "Failed to create grownBlob bitmpap!\n");
         return -1;
     }
     
-    food = al_load_bitmap("food.png");
+    food = al_load_bitmap("..\\res\\food.png");
     if (!food) {
         fprintf(stderr, "Failed to create food bitmap!\n");
         return -1;
@@ -557,10 +549,9 @@ int Gui::loadBitmaps(void) {
     return 0;
 }
 
-int Gui::drawBlobs(World& sim) {
-    bool out = true;
+int Gui::drawBlobs() {
 
-    Blob* bobElBlob= sim.getNextBlob();
+    Blob* bobElBlob = sim->getNextBlob();
     while (bobElBlob != NULL) {
         
         double posX, posY, angle;
@@ -575,6 +566,7 @@ int Gui::drawBlobs(World& sim) {
                 al_draw_bitmap_region(babyBlob, (displaySizeX - posX), (displaySizeY - posY), al_get_bitmap_width(babyBlob) - (displaySizeX - posX), al_get_bitmap_height(babyBlob) - (displaySizeY - posY), 0.0f, 250, 0);
 
             }
+            break;
         
         
         case GROWNBLOB: al_draw_bitmap(grownBlob, posX, posY, 0);
@@ -614,23 +606,72 @@ int Gui::drawBlobs(World& sim) {
 
             }
             break;
+        default:
+            break;
         }
-
-        bobElBlob = sim.getNextBlob(bobElBlob);
+        
+        bobElBlob = sim->getNextBlob(bobElBlob);
     }
     return 0;
 }
 
-int Gui::drawFood(World& sim) {
+int Gui::drawFood(void) {
 
-    //falta
-    return 1;
+    Food* foodobj = sim->getNextFood();
+
+    while (foodobj != NULL) {
+        
+        double posX, posY;
+        foodobj->getPosition(posX, posY);
+        
+        al_draw_bitmap(food, posX, posY, 0);
+        if (posX > (displaySizeX - al_get_bitmap_width(food)) && posY > (displaySizeY - al_get_bitmap_height(food))) {
+
+            al_draw_bitmap_region(food, (displaySizeX - posX), (displaySizeY - posY), al_get_bitmap_width(food) - (displaySizeX - posX), al_get_bitmap_height(food) - (displaySizeY - posY), 0.0f, 0.0f, 0);
+
+        }
+        else if (posX > (displaySizeX - al_get_bitmap_width(food))) {
+
+            al_draw_bitmap_region((food), (displaySizeX - posX), 0.0f, al_get_bitmap_width(food) - (displaySizeX - posX), al_get_bitmap_height(food), 0.0f, posY, 0);
+
+        }
+        else if (posY > (displaySizeY - al_get_bitmap_height(food))) {
+
+            al_draw_bitmap_region(food, 0.0f, (displaySizeY - posY), al_get_bitmap_width(food), al_get_bitmap_height(food) - (displaySizeY - posY), posX, 250.0f, 0);
+
+        }
+    
+    }
+
+    return 0;
 }
 
-int Gui::drawBackground(World& sim) {
+int Gui::drawBackground(void) {
 
     al_draw_scaled_bitmap(background, 0.0f, 0.0f, al_get_bitmap_width(background), al_get_bitmap_height(background), 0, 250, displaySizeX, displaySizeY, 0);
     return 0;
+}
+
+bool Gui::initWorld(void){
+    
+    Size_t blobSizes[NBLOBS];
+    
+    blobSizes[BABYBLOB] = {(double)al_get_bitmap_width(babyBlob), (double)al_get_bitmap_height(babyBlob)};
+    blobSizes[GROWNBLOB] = {(double)al_get_bitmap_width(grownBlob), (double)al_get_bitmap_height(grownBlob)};
+    blobSizes[GOODOLDBLOB] = { (double)al_get_bitmap_width(goodOldBlob), (double)al_get_bitmap_height(goodOldBlob) };
+    
+    this->sim = new World(mode, displaySizeX, displaySizeY, initialBlobCount, foodCount, blobSizes, deathProbability, smellRadius, maxSpeed);
+    if (sim == NULL) {
+        return false;
+    }
+    return true;
+}
+
+void Gui::destroyWorld(void){
+    if (sim == NULL) return;
+    sim->destroy();
+    delete sim;
+    return;
 }
 
 
@@ -661,7 +702,7 @@ float Gui::getRelativeSpeed(void) {
 
 float Gui::getDead(int age){
     enum lifespan{BABY, GROWN, GOODOLD};
-    float prob;
+    float prob = 0;
     
     switch (age){
     case BABY:
@@ -678,7 +719,7 @@ float Gui::getDead(int age){
 }
 
 float Gui::getSmellRadius(void) {
-    return smellRadius;
+    return smellRadius[0];
 }
 
 float Gui::getJiggle(void) {

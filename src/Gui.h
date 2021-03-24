@@ -13,6 +13,8 @@
 
 #include "World.h"
 
+#include <cmath>
+
 //#define DEBUG_GUI 
 
 class Gui {
@@ -28,7 +30,7 @@ public:
     void popup(const char* msg);
 
     int showInitialWindow(void); //Debe recibir sym creo
-    int showMainWindow(World &sim);
+    int showMainWindow(void);
 
     int loadBitmaps(void);
 
@@ -38,11 +40,10 @@ public:
     int configureImGui(void);
 
     int checkData(void);
-    int parseData(void);
 
-    int drawBlobs(World &sim);
-    int drawFood(World &sim);
-    int drawBackground(World& sim);
+    int drawBlobs(void);
+    int drawFood(void);
+    int drawBackground(void);
 
     bool getClose(void);
 
@@ -55,9 +56,10 @@ public:
     float getSmellRadius(void);
     float getJiggle(void);
 
+    //void setData(World& sim);
 
-    void setInitialData(World &sim);
-    void setData(World& sim);
+    bool initWorld(void);
+    void destroyWorld(void);
 
 private:
 
@@ -65,10 +67,10 @@ private:
     int mode;
     int initialBlobCount;
     float relativeSpeed;
-    int maxSpeed;
-    int smellRadius;
+    float maxSpeed;
+    float smellRadius[NBLOBS];
     float jiggleLimit;
-    float deathProbability[3];
+    float deathProbability[NBLOBS];
     int foodCount;
     
     std::string errorType;
@@ -92,8 +94,8 @@ private:
     ALLEGRO_BITMAP* grownBlob;
     ALLEGRO_BITMAP* goodOldBlob;
 
-    int displaySizeX;
-    int displaySizeY;
+    double displaySizeX;
+    double displaySizeY;
 
     bool runningInitial;
     bool runningMain;
@@ -103,6 +105,8 @@ private:
     double fps; 
 
     int prueba;
+
+    World* sim;
 };
 
 #endif /* ! GUI_H */

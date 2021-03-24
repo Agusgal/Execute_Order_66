@@ -6,25 +6,26 @@
 
 #include "Gui.h"
 #include "World.h"
+#include "randomGenerators.h"
 
 int main(int, char**)
 {
-    World sim(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL); //se crea la simulacion a la que luego le aprseamos los datos 
-    
+    initRandom(); //Crea seed para generar numeros al azar 
     Gui myGui; //creo la gui que recibe la data del usuario 
 
     if (!myGui.showInitialWindow()) {
         
         //Inicio la simulacion con parametros iniciales sacados por la gui
-        //parse, init sim, etc
-        
+        if (!myGui.initWorld()) {
+            return 1;
+        }
 
         while (!myGui.getClose()) {
         
-            if (myGui.showMainWindow(sim)) { //con un return distinto a 0 hubo error 
+            if (myGui.showMainWindow()) { //con un return distinto a 0 hubo error 
                 
                 std::cout << "Fallo el metodo que grafica che, mala suerte" << std::endl;
-                return 0;
+                return 1;
             }
 
         }
@@ -33,3 +34,4 @@ int main(int, char**)
     
     return 0;
 }
+
