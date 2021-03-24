@@ -61,6 +61,7 @@ public:
 
     bool initWorld(void);
     void destroyWorld(void);
+    void updateData(void);
 
 private:
 
@@ -104,8 +105,6 @@ private:
 
     double simTpS;
     double fps; 
-
-    int prueba;
 
     World* sim;
 };

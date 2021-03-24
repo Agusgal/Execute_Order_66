@@ -41,8 +41,6 @@ Gui::Gui() {
     deathProbability[2] = 0;
 
     foodCount = 0;
-    prueba = 0;
-
 }
 
 
@@ -158,12 +156,17 @@ int Gui::showMainWindow(void) {//end esarrollo
                 ImGui_ImplAllegro5_CreateDeviceObjects();
             }
             if (ev.type == ALLEGRO_EVENT_TIMER && ev.timer.source == simTimer) {
-                prueba++;
                 //aca simulo un tick 
-                //sim.simulate()
+                updateData();
+                
+                if (!sim->worldTick(jiggleLimit)) {
+                    closeWindow = true;
+                    return -1;
+                }
+                
                 drawBackground();
-               // drawBlobs();
-                //drawFood();
+                drawBlobs();
+                drawFood();
             }
             if (ev.type == ALLEGRO_EVENT_TIMER && ev.timer.source == flipTimer) {
             
@@ -172,7 +175,7 @@ int Gui::showMainWindow(void) {//end esarrollo
                 ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
 
 
-                if (mainWindow()) {
+                if(mainWindow()) {
                     runningMain = false;
                 }
 
@@ -227,7 +230,7 @@ int Gui::initialWindow(void) {
     if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 
-    ImGui::SetNextWindowSize(ImVec2(250, displaySizeY), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
+    ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, displaySizeY), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
 
     ImGui::Begin("Configure Simulation", NULL, window_flags);
 
@@ -315,10 +318,11 @@ int Gui::mainWindow(void) {
 
     ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, displaySizeY), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
 
-    ImGui::Begin("Configure Simulation", NULL, window_flags);
+    ImGui::Begin("Configure Simulation2", NULL, window_flags);
 
     ImGui::SliderFloat("Relative speed", &relativeSpeed, 0.0f, 1.0f, "speed ratio = %.3f");
 
+    ImGui::SameLine();
     ImGui::SliderFloat("Max blob speed", &maxSpeed, 1, 30);
     ImGui::SameLine(); helpMarker("contrl + click to enter value, must not exceed 50 pixels per tick");
 
@@ -382,6 +386,23 @@ int Gui::init(void) {
     return 0;
 }
  
+void Gui::updateData(void) {
+
+    sim->setDeathChance(BABYBLOB, deathProbability[BABYBLOB]);
+    sim->setDeathChance(GROWNBLOB, deathProbability[GROWNBLOB]);
+    sim->setDeathChance(GOODOLDBLOB, deathProbability[GOODOLDBLOB]);
+
+
+    sim->setFoodCount(foodCount);
+    sim->setMaxSpeed(maxSpeed);
+    sim->setRelativeSpeed(relativeSpeed);
+    sim->setSmellRadius(BABYBLOB, smellRadius[BABYBLOB]);
+    sim->setSmellRadius(GROWNBLOB, smellRadius[GROWNBLOB]);
+    sim->setSmellRadius(GOODOLDBLOB, smellRadius[GOODOLDBLOB]);
+}
+
+
+
 int Gui::checkData() {
     
     //Control blobN
@@ -647,7 +668,7 @@ int Gui::drawFood(void) {
             al_draw_bitmap_region(food, 0.0f, (displaySizeY - posY), al_get_bitmap_width(food), al_get_bitmap_height(food) - (displaySizeY - posY), posX, 250.0f, 0);
 
         }
-    
+        foodobj = sim->getNextFood(foodobj);
     }
 
     return 0;

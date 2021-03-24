@@ -94,6 +94,8 @@ public:
     void setRelativeSpeed(float speed);
     void setFoodCount(int food);
 
+    void simulate();
+
 private:
     int mode;
 

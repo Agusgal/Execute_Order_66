@@ -22,10 +22,8 @@ int main(int, char**)
 
         while (!myGui.getClose()) {
         
-            if (myGui.showMainWindow()) { //con un return distinto a 0 hubo error 
-                
-                std::cout << "Fallo el metodo que grafica che, mala suerte" << std::endl;
-                return 1;
+            if (!myGui.showMainWindow()) { //con un return distinto a 0 hubo error 
+                return -1;
             }
 
         }
