@@ -3,7 +3,7 @@
 
 /******************** DEFINITIONS ********************/
 // Default decimal precision taken into account when generating float and double
-#define MINIMUM_PRECISION	    (5)
+#define MINIMUM_PRECISION	    (2)
 
 /******************** MACROS ********************/
 

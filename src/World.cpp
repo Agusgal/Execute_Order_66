@@ -357,7 +357,7 @@ SDLL_Node* World::findBlobNode(Blob* blob) {
         
         if (blobNode == NULL) {
             // _blob_ was not found in the list.
-            std::cout << "Unable to find the given blob." << std::endl;
+            //std::cout << "Unable to find the given blob." << std::endl;
             return NULL;
         }
     }
@@ -389,7 +389,7 @@ Food* World::getNextFood(Food* lastFood) {
 
     // The next food doesn't exist or _lastFood_ was not found in the list.
     if (foodNode == NULL) {
-        std::cout << "Unable to find the given food." << std::endl;
+        //std::cout << "Unable to find the given food." << std::endl;
         return NULL;
     }
     

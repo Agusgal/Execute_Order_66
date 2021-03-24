@@ -230,7 +230,7 @@ int Gui::initialWindow(void) {
     if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 
-    ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, displaySizeY), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
+    ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, 260), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
 
     ImGui::Begin("Configure Simulation", NULL, window_flags);
 
@@ -316,7 +316,7 @@ int Gui::mainWindow(void) {
     if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 
-    ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, displaySizeY), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
+    ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, 260), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
 
     ImGui::Begin("Configure Simulation2", NULL, window_flags);
 
@@ -687,6 +687,10 @@ bool Gui::initWorld(void){
     blobSizes[BABYBLOB] = {(double)al_get_bitmap_width(babyBlob), (double)al_get_bitmap_height(babyBlob)};
     blobSizes[GROWNBLOB] = {(double)al_get_bitmap_width(grownBlob), (double)al_get_bitmap_height(grownBlob)};
     blobSizes[GOODOLDBLOB] = { (double)al_get_bitmap_width(goodOldBlob), (double)al_get_bitmap_height(goodOldBlob) };
+
+
+    smellRadius[GROWNBLOB] = smellRadius[BABYBLOB];
+    smellRadius[GOODOLDBLOB] = smellRadius[BABYBLOB];
     
     this->sim = new World(mode, displaySizeX, displaySizeY, initialBlobCount, foodCount, blobSizes, deathProbability, smellRadius, maxSpeed);
     if (sim == NULL) {
