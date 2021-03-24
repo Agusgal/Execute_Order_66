@@ -80,8 +80,8 @@ const Point_t* Food::updateAndGetPosition(void) {
 /******************** PRIVATE METHODS ********************/
 void Food::generatePosition(void) {
     // TODO: Handle floating point
-    this->current.x = generateRandomNumber((unsigned)this->maximum.x);
-    this->current.y = generateRandomNumber((unsigned)this->maximum.y);
+    this->current.x = generateRandomNumber(this->maximum.x);
+    this->current.y = generateRandomNumber(this->maximum.y);
 
 #ifdef DEBUG
     std::cout << "Food in: (" << this->current.x << ", " << this->current.y << ")" << std::endl;
