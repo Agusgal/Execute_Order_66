@@ -14,14 +14,14 @@ long double distance(Point_t& firstPoint, Point_t& secondPoint);
 
 /******************** CONSTRUCTOR ********************/
 World::World(
+    int worldMode,
     double worldWidth, double worldHeight,
     unsigned blobsNumber, unsigned foodAmmount,
     Size_t blobSizeByAge[NBLOBS],
     double deathChance[NBLOBS], double smellRadius[NBLOBS],
-    double blobsMaximumSpeed,
-    bool blobsMaximumSpeedRandom
-) {
+    double blobsMaximumSpeed) {
     // Initialize everything 
+    this->mode = MODE_INVALID;
     this->blobsList = NULL;
     this->foodList = NULL;
     this->dimensions = { 0 };
@@ -29,6 +29,7 @@ World::World(
     this->aliveBlobs = 0;
     this->blobsMaxSpeed = 0;
     this->blobsMaxSpeedIsRnd = false;
+    this->blobsRelativeSpeed = 0;
 
     for (int i = BABYBLOB; i < NBLOBS; i++) {
         this->blobsDeathChance[i] = 0;
@@ -37,7 +38,13 @@ World::World(
     }
 
     // Data validation
-    if (islessequal(worldWidth, 0.0) || islessequal(worldHeight, 0.0)) {
+    if (worldMode != MODE_ONE && worldMode != MODE_TWO) {
+        std::cout
+            << "Invalid world mode. Aborting."
+            << std::endl;
+        return;
+    }
+    else if (islessequal(worldWidth, 0.0) || islessequal(worldHeight, 0.0)) {
         std::cout
             << "World dimensions must be greater than zero."
             << std::endl;
@@ -85,6 +92,7 @@ World::World(
         }
     }
 
+    this->mode = worldMode;
     this->dimensions.width = worldWidth;
     this->dimensions.height = worldHeight;
 
@@ -95,7 +103,16 @@ World::World(
     }
 
     this->blobsMaxSpeed = blobsMaximumSpeed;
-    this->blobsMaxSpeedIsRnd = blobsMaximumSpeedRandom;
+    switch (this->mode) {
+        MODE_ONE:
+            this->blobsMaxSpeedIsRnd = false;
+            break;
+        MODE_TWO:
+            this->blobsMaxSpeedIsRnd = true;
+            break;
+        default:
+            break;
+    }
 
     // Allocate Blob and Food list
     Point_t worldMax = {0};
@@ -163,6 +180,57 @@ void World::destroy(void) {
     }
 
     return;
+}
+
+bool World::worldTick(const double randomJiggleLimit) {
+    bool success = false;
+
+    double tickSpeed = 0;
+
+    switch (this->mode) {
+        MODE_ONE:
+        /*
+        En el modo 1 los blobs en todo momento comparten la misma velocidad. 
+        El usuario setea la velocidad con dos valores:
+         - Velocidad máxima medida en px/tick (elegida antes de que inicie la
+        simulación).
+         - Velocidad porcentual entre 0% y 100% (parámetro de simulación).
+        
+        La velocidad total es la velocidad máxima multiplicada por la 
+        velocidad porcentual.
+        */
+            tickSpeed = this->blobsMaxSpeed * this->blobsRelativeSpeed;
+            Blob* john = NULL;
+
+            this->checkFood();
+            this->checkMerge(randomJiggleLimit);
+
+            for (SDLL_Node* curr = blobsList->getHead(); curr != NULL; curr = curr->getNextNode()) {
+                if (curr == NULL) break;
+                john = curr->getData()->blob;
+
+                if (!blobsDeath(*john)) {
+                    john->move(tickSpeed);
+                }
+            }
+            break;
+
+        MODE_TWO:
+        /*
+        En el modo 2, cada blob tiene una velocidad máxima distinta a la de los 
+        demás. Estas se eligen aleatoriamente entre 0 y un valor máximo elegido 
+        por el usuario antes de que inicie la simulación. 
+        Todos los blobs comparten la velocidad porcentual.
+        */
+            break;
+
+        default:
+            std::cout << "Invalid game mode. Unable to proceed." << std::endl;
+            success = false;
+            break;
+    }
+
+    return success;
 }
 
 bool World::checkFood(void) {
@@ -339,8 +407,8 @@ bool World::setDeathChance(const int age, const double newChance) {
     }
 
     this->blobsDeathChance[age] = newChance;
-    // TODO: Set death chance to all blobs this age
-    // updateBlobCommons();
+    // Set death chance to all blobs this age
+    updateBlobCommons();
 
     return true;
 }
@@ -360,8 +428,8 @@ bool World::setSmellRadius(const int age, const double newRadius) {
     }
 
     this->blobsSmellRadius[age] = newRadius;
-    // TODO: Set smell radius to all blobs this age
-    // updateBlobCommons();
+    // Set smell radius to all blobs this age
+    updateBlobCommons();
 
     return true;
 }
@@ -565,6 +633,18 @@ Food* World::smell(Blob& blob) {
     }
     
     return nearestFood;
+}
+
+
+void World::updateBlobCommons(void) {
+    for (SDLL_Node* curr = blobsList->getHead();
+        curr != NULL; curr = curr->getNextNode()) {
+        Blob* john = curr->getData()->blob;
+        john->setDeathChance(blobsDeathChance[john->getAge()]);
+        john->setSmellRadius(blobsSmellRadius[john->getAge()]);
+    }
+
+    return;
 }
 
 

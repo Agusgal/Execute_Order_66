@@ -4,15 +4,22 @@
 #include "SDLL.h"
 #include "Blob.h"
 
+enum worldModes {
+    MODE_INVALID = -1,
+    MODE_ONE = 0,
+    MODE_TWO,
+    NMODES
+};
+
 class World {
 public:
     World(
+        int worldMode,
         double width, double height,
         unsigned blobsNumber, unsigned foodAmmount, 
         Size_t blobSizeByAge[NBLOBS],
         double deathChance[NBLOBS], double smellRadius[NBLOBS],
-        double blobsMaximumSpeed,
-        bool blobsMaximumSpeedRandom = false // When true, the maximum speed of each blob is a random number between 0.0 and blobsbMaximumSpeed
+        double blobsMaximumSpeed
     );
 
     /*
@@ -20,6 +27,11 @@ public:
      * 
      */
     void destroy(void);
+
+    /*
+     * 
+     */
+    bool worldTick(const double randomJiggleLimit);
 
     /*
      * What are the odds? Will this blob die?
@@ -81,6 +93,8 @@ public:
     void setFoodCount(unsigned food);
 
 private:
+    int mode;
+
     SDLL* blobsList;
     SDLL* foodList;
 
@@ -108,9 +122,6 @@ private:
     void initializeFood(Food* food); // Call this after creation
 
     void updateFood(Food& food); // Make a piece of food change its coordinates
-
-
-
 
     SDLL_Node* findBlobNode(Blob* blob);
 
@@ -145,7 +156,7 @@ private:
     Food* smell(Blob& blob);
 
 
-    // TODO: void updateBlobCommons(void);
+    void updateBlobCommons(void);
 };
 
 #endif /* ! WORLD_H */
