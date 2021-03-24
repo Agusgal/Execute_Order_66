@@ -17,7 +17,9 @@
 /******************** CONSTRUCTOR ********************/
 Coordinates::Coordinates() {
 #ifdef DEBUG
+    std::cout << std::endl << "---DEBUG---" << std::endl;
     std::cout << "Coordinates() called" << std::endl;
+    std::cout << "***DEBUG***" << std::endl;
 #endif
 
     this->maximumCoordinates = { 0 };
@@ -27,6 +29,7 @@ Coordinates::Coordinates() {
 
 Coordinates::Coordinates(double maxX, double maxY) {
 #ifdef DEBUG
+    std::cout << std::endl << "---DEBUG---" << std::endl;
     std::cout << "Coordinates(double, double) called" << std::endl;
     std::cout 
         << "Coordinates(maxX = " 
@@ -35,6 +38,7 @@ Coordinates::Coordinates(double maxX, double maxY) {
         << maxY
         << ")"
         << std::endl;
+    std::cout << "***DEBUG***" << std::endl;
 #endif
 
     this->maximumCoordinates = { 0 };
@@ -64,7 +68,9 @@ void Coordinates::rotateRadians(const double angleInRadians) {
 }
 void Coordinates::rotate(const double rotationAngle) {
 #ifdef DEBUG
+    std::cout << std::endl << "---DEBUG---" << std::endl;
     std::cout << "Rotate: " << rotationAngle << std::endl;
+    std::cout << "***DEBUG***" << std::endl;
 #endif
 
     // Angles that fall out of range (-360.0 ; 360.0) are taken back to this range
@@ -96,7 +102,9 @@ void Coordinates::rotate(const double rotationAngle) {
 
 void Coordinates::update(const double modulus) {
 #ifdef DEBUG
+    std::cout << std::endl << "---DEBUG---" << std::endl;
     std::cout << "Update (" << modulus << ")" << std::endl;
+    std::cout << "***DEBUG***" << std::endl;
 #endif
 
     if (islessequal(modulus, 0.0)) {
@@ -160,10 +168,12 @@ void Coordinates::update(const double modulus) {
 
 void Coordinates::getPosition(double& x, double& y) {
 #ifdef DEBUG
+    std::cout << std::endl << "---DEBUG---" << std::endl;
     std::cout
         << "X: " << this->position.x
         << "Y: " << this->position.y
         << std::endl;
+    std::cout << "***DEBUG***" << std::endl;
 #endif
     x = this->position.x;
     y = this->position.y;
