@@ -75,6 +75,10 @@ int Gui::showInitialWindow(void) {
 
     al_start_timer(simTimer);
     al_start_timer(flipTimer);
+    
+    if (loadBitmaps()) {
+        return -1;
+    }
 
     //MainLoop
     while (runningInitial) {
@@ -144,6 +148,7 @@ int Gui::showMainWindow(void) {//end esarrollo
 
             if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
                 runningMain = false;
+                closeWindow = true;
                 //falta limpiar()
                 return -1;
             }
@@ -157,8 +162,8 @@ int Gui::showMainWindow(void) {//end esarrollo
                 //aca simulo un tick 
                 //sim.simulate()
                 drawBackground();
-                drawBlobs();
-                drawFood();
+               // drawBlobs();
+                //drawFood();
             }
             if (ev.type == ALLEGRO_EVENT_TIMER && ev.timer.source == flipTimer) {
             
@@ -173,7 +178,7 @@ int Gui::showMainWindow(void) {//end esarrollo
 
                 ImGui::Render();	
 
-                al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));	
+                //al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));	
 
                 //Todo lo que dibuje aca va a quedar por detrás de las ventanas de DearImGui
 
@@ -342,8 +347,6 @@ int Gui::mainWindow(void) {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 #endif
 
-    ImGui::PopItemWidth();
-
     ImGui::End();
     return 0;
 }
@@ -370,8 +373,12 @@ int Gui::init(void) {
         fprintf(stderr, "failed to initialize mouse!\n");
         return -1;
     }
+
+    if (!al_init_image_addon()) {
+        fprintf(stderr, "failed to initialize image addon!\n");
+        return -1;
+    }
    
-    loadBitmaps();
     return 0;
 }
  
@@ -516,32 +523,32 @@ int Gui::configureImGui(void) {
 
 
 int Gui::loadBitmaps(void) {
-
-    background = al_load_bitmap("..\\res\\background.jpg");
+   
+    background = al_load_bitmap("C:\\Users\\Agus\\source\\repos\\Agusgal\\Execute_Order_66\\res\\background.jpg");
     if (!background){
         fprintf(stderr, "Failed to load background bitmap!\n");
         return -1;
     }
     
-    babyBlob = al_load_bitmap("..\\res\\babyblob.png");
+    babyBlob = al_load_bitmap("C:\\Users\\Agus\\source\\repos\\Agusgal\\Execute_Order_66\\res\\babyblob.png");
     if (!babyBlob) {
         fprintf(stderr, "Failed to create babyBlob bitmpap!\n");
         return -1;
     }
     
-    goodOldBlob = al_load_bitmap("..\\res\\goodoldblob.png");
+    goodOldBlob = al_load_bitmap("C:\\Users\\Agus\\source\\repos\\Agusgal\\Execute_Order_66\\res\\goodoldblob.png");
     if (!goodOldBlob) {
         fprintf(stderr, "Failed to create goodOldBlob bitmpap!\n");
         return -1;
     }
     
-    grownBlob = al_load_bitmap("..\\res\\grownblob.png");
+    grownBlob = al_load_bitmap("C:\\Users\\Agus\\source\\repos\\Agusgal\\Execute_Order_66\\res\\grownblob.png");
     if (!grownBlob) {
         fprintf(stderr, "Failed to create grownBlob bitmpap!\n");
         return -1;
     }
     
-    food = al_load_bitmap("..\\res\\food.png");
+    food = al_load_bitmap("C:\\Users\\Agus\\source\\repos\\Agusgal\\Execute_Order_66\\res\\food.png");
     if (!food) {
         fprintf(stderr, "Failed to create food bitmap!\n");
         return -1;
@@ -655,7 +662,7 @@ int Gui::drawBackground(void) {
 bool Gui::initWorld(void){
     
     Size_t blobSizes[NBLOBS];
-    
+
     blobSizes[BABYBLOB] = {(double)al_get_bitmap_width(babyBlob), (double)al_get_bitmap_height(babyBlob)};
     blobSizes[GROWNBLOB] = {(double)al_get_bitmap_width(grownBlob), (double)al_get_bitmap_height(grownBlob)};
     blobSizes[GOODOLDBLOB] = { (double)al_get_bitmap_width(goodOldBlob), (double)al_get_bitmap_height(goodOldBlob) };
