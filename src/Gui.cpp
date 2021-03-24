@@ -7,6 +7,8 @@ Gui::Gui() {
 
     runningInitial = true;
 
+    noError = true;
+
     display = NULL;
     queue = NULL;
     simTimer = NULL;
@@ -35,7 +37,7 @@ Gui::Gui() {
 }
 
 
-int Gui::initialGraph(void) {
+int Gui::showInitialWindow(void) {
 
     init();
 
@@ -94,80 +96,40 @@ int Gui::initialGraph(void) {
                     runningInitial = false;
                 }
 
-                ImGui::Render();	//No dibuja! Solamente calcula que es lo que tiene que dibujarse
+                ImGui::Render();	
 
-                        // Puedo usar funciones de dibujo de Allegro ademas de las de 
-                        // ImGui.
-                        // Todo lo que dibuje antes de ImGui_ImplAllegro5_RenderDrawData
-                        // va a quedar detras de las ventanas de DearImGui, y todo lo 
-                        // que dibuje despues va a quedar encima de las ventanas de 
-                        // DearImGui.
-
-                al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));	//Va a quedar detras de las ventanas.
+                al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));	
 
                 //Todo lo que dibuje aca va a quedar por detrás de las ventanas de DearImGui
 
-                ImGui_ImplAllegro5_RenderDrawData(ImGui::GetDrawData());	//Dibuja las ventanas, pero no hace al_flip_display()
+                ImGui_ImplAllegro5_RenderDrawData(ImGui::GetDrawData());	
 
                 //Todo lo que dibuje aca va a quedar por encima de las ventanas de DearImGui
 
-
-                //Debe ocurrir con un timer
-                al_flip_display(); //DearImGui nunca hace al_flip_display()
+                al_flip_display(); 
 
             }
         }
-
-        /*ImGui_ImplAllegro5_NewFrame();
-        ImGui::NewFrame();
-        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-
-
-        if (mainWindow()) {
-            runningInitial = false;
-        }
-        
-        ImGui::Render();	//No dibuja! Solamente calcula que es lo que tiene que dibujarse
-
-                // Puedo usar funciones de dibujo de Allegro ademas de las de 
-                // ImGui.
-                // Todo lo que dibuje antes de ImGui_ImplAllegro5_RenderDrawData
-                // va a quedar detras de las ventanas de DearImGui, y todo lo 
-                // que dibuje despues va a quedar encima de las ventanas de 
-                // DearImGui.
-
-        al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));	//Va a quedar detras de las ventanas.
-
-        //Todo lo que dibuje aca va a quedar por detrás de las ventanas de DearImGui
-
-        ImGui_ImplAllegro5_RenderDrawData(ImGui::GetDrawData());	//Dibuja las ventanas, pero no hace al_flip_display()
-
-        //Todo lo que dibuje aca va a quedar por encima de las ventanas de DearImGui
-
-
-        //Debe ocurrir con un timer
-        al_flip_display(); //DearImGui nunca hace al_flip_display()*/
-
     }
 
     // Cleanup final
-    ImGui_ImplAllegro5_Shutdown();
-    ImGui::DestroyContext();
+    //ImGui_ImplAllegro5_Shutdown();
+    //ImGui::DestroyContext();
     
     //al_destroy_event_queue(queue);
     //al_destroy_display(display);
     //al_shutdown_primitives_addon();
-
+   
     return 0;
 }
 
-int Gui::mainGraph(void) {
+int Gui::showMainWindow(World& sim) {//end esarrollo
 
     while (runningMain) {
 
         while (al_get_next_event(queue, &ev)) {
 
-            ImGui_ImplAllegro5_ProcessEvent(&ev);	// Mandar el evento a Dear ImGui para que lo procese
+            ImGui_ImplAllegro5_ProcessEvent(&ev);	
 
             if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
                 runningMain = false;
@@ -184,6 +146,7 @@ int Gui::mainGraph(void) {
                 //aca simulo un tick 
                 //simulate()
                 //draw()
+                drawBackground(sim);
             }
             if (ev.type == ALLEGRO_EVENT_TIMER && ev.timer.source == flipTimer) {
             
@@ -193,29 +156,20 @@ int Gui::mainGraph(void) {
 
 
                 if (mainWindow()) {
-                    runningInitial = false;
+                    runningMain = false;
                 }
 
-                ImGui::Render();	//No dibuja! Solamente calcula que es lo que tiene que dibujarse
+                ImGui::Render();	
 
-                        // Puedo usar funciones de dibujo de Allegro ademas de las de 
-                        // ImGui.
-                        // Todo lo que dibuje antes de ImGui_ImplAllegro5_RenderDrawData
-                        // va a quedar detras de las ventanas de DearImGui, y todo lo 
-                        // que dibuje despues va a quedar encima de las ventanas de 
-                        // DearImGui.
-
-                al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));	//Va a quedar detras de las ventanas.
+                al_clear_to_color(al_map_rgba_f(1, 1, 0.8, 1));	
 
                 //Todo lo que dibuje aca va a quedar por detrás de las ventanas de DearImGui
 
-                ImGui_ImplAllegro5_RenderDrawData(ImGui::GetDrawData());	//Dibuja las ventanas, pero no hace al_flip_display()
+                ImGui_ImplAllegro5_RenderDrawData(ImGui::GetDrawData());	
 
                 //Todo lo que dibuje aca va a quedar por encima de las ventanas de DearImGui
 
-
-                //Debe ocurrir con un timer
-                al_flip_display(); //DearImGui nunca hace al_flip_display()
+                al_flip_display(); 
             }
         }
 
@@ -234,6 +188,8 @@ int Gui::mainGraph(void) {
 
 int Gui::initialWindow(void) {
 
+    int out = 0;//esto se retorna
+
     static bool NoTitlebar = true;
     static bool NoMenu = true;
     static bool NoCollapse = true;
@@ -242,6 +198,7 @@ int Gui::initialWindow(void) {
     static bool NoClose = true;
     static bool NoBackground = true;
     static bool NoScrollbar = true;
+    static bool no_bring_to_front = false;
 
     ImGuiWindowFlags window_flags = 0;
     if (NoTitlebar)        window_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -251,40 +208,67 @@ int Gui::initialWindow(void) {
     if (NoResize)          window_flags |= ImGuiWindowFlags_NoResize;
     if (NoCollapse)        window_flags |= ImGuiWindowFlags_NoCollapse;
     if (NoBackground)      window_flags |= ImGuiWindowFlags_NoBackground;
+    if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+
 
     ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, displaySizeY), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
 
-    // Main body of the Demo window starts here.
     ImGui::Begin("Configure Simulation", NULL, window_flags);
-   
+
 
     const char* items[] = { "Mode 1", "Mode 2" };
     ImGui::Combo("Mode", &mode, items, IM_ARRAYSIZE(items)); //chequear modo simulacion 
-    
-    ImGui::InputInt("Blob number", &initialBlobCount); //chequear al final que no sean 2 millones
+
+    ImGui::InputInt("Blob number", &initialBlobCount);
     ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
 
-    //ImGui::SetNextItemWidth(-FLT_MIN);
     ImGui::SliderFloat("Relative speed", &relativeSpeed, 0.0f, 1.0f, "speed ratio = %.3f");
 
     ImGui::SliderInt("Max blob speed", &maxSpeed, 1, 30);
     ImGui::SameLine(); helpMarker("contrl + click to enter value, must not exceed 50 pixels per tick");
 
-    ImGui::InputInt("Smell Radius", &smellRadius);//chequear que este bien ingresado
-    ImGui::SameLine();helpMarker("Enter values between 0 and 50");
+    ImGui::InputInt("Smell Radius", &smellRadius);
+    ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
 
     ImGui::SliderAngle("Jiggle Limit", &jiggleLimit, 0.0f, 360.0f);
 
     ImGui::SliderFloat("BabyBlob", &deathProbability[0], 0.01f, 0.99f, "P.death = %.3f");
 
-    static float pDeath2 = 0.0f;
     ImGui::SliderFloat("GrownBlob", &deathProbability[1], 0.01f, 0.99f, "P.death = %.3f");
 
-    static float pDeath3 = 0.0f;
     ImGui::SliderFloat("GoodOldBlob", &deathProbability[2], 0.01f, 0.99f, "P.death = %.3f");
 
-    ImGui::InputInt("Food count", &foodCount); //Chequear que sea un numero valido
+    ImGui::InputInt("Food count", &foodCount);
     ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
+
+    if (ImGui::Button("Start Simulation", ImVec2(guiWindowSizeX, 50))){
+        
+        if (checkData()) {
+            noError = false;
+        }  
+    }
+    else {
+        noError = true;
+        //Puedo seguir al programa principal
+    }
+    
+    if (!noError) {
+        ImGui::OpenPopup("error");
+        popupOpen = true;
+    }
+    if (popupOpen) {
+        popup(errorType.c_str());
+    }
+    
+    
+    
+    
+    
+
+    //popup(errorType.c_str());
+    //if(!noError){
+     //   popup(errorType.c_str());
+    //}
 
 #ifdef DEBUG_GUI
     ImGuiIO& io = ImGui::GetIO();
@@ -292,10 +276,72 @@ int Gui::initialWindow(void) {
 #endif
 
     ImGui::End();
-    return 0;
+    return out;
 }
 
 int Gui::mainWindow(void) {
+
+    int out = 0;//esto se retorna
+
+    static bool NoTitlebar = true;
+    static bool NoMenu = true;
+    static bool NoCollapse = true;
+    static bool NoResize = true;
+    static bool NoMove = true;
+    static bool NoClose = true;
+    static bool NoBackground = true;
+    static bool NoScrollbar = true;
+    static bool no_bring_to_front = false;
+
+    ImGuiWindowFlags window_flags = 0;
+    if (NoTitlebar)        window_flags |= ImGuiWindowFlags_NoTitleBar;
+    if (NoScrollbar)       window_flags |= ImGuiWindowFlags_NoScrollbar;
+    if (!NoMenu)           window_flags |= ImGuiWindowFlags_MenuBar;
+    if (NoMove)            window_flags |= ImGuiWindowFlags_NoMove;
+    if (NoResize)          window_flags |= ImGuiWindowFlags_NoResize;
+    if (NoCollapse)        window_flags |= ImGuiWindowFlags_NoCollapse;
+    if (NoBackground)      window_flags |= ImGuiWindowFlags_NoBackground;
+    if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+
+
+    ImGui::SetNextWindowSize(ImVec2(guiWindowSizeX, displaySizeY), ImGuiCond_Always); //Aca pongo tamaño de la pantalla
+
+    ImGui::Begin("Configure Simulation", NULL, window_flags);
+
+    ImGui::SliderFloat("Relative speed", &relativeSpeed, 0.0f, 1.0f, "speed ratio = %.3f");
+
+    ImGui::SliderInt("Max blob speed", &maxSpeed, 1, 30);
+    ImGui::SameLine(); helpMarker("contrl + click to enter value, must not exceed 50 pixels per tick");
+
+    ImGui::InputInt("Smell Radius", &smellRadius);
+    ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
+
+    ImGui::SliderAngle("Jiggle Limit", &jiggleLimit, 0.0f, 360.0f);
+
+    ImGui::SliderFloat("BabyBlob", &deathProbability[0], 0.01f, 0.99f, "P.death = %.3f");
+
+    ImGui::SliderFloat("GrownBlob", &deathProbability[1], 0.01f, 0.99f, "P.death = %.3f");
+
+    ImGui::SliderFloat("GoodOldBlob", &deathProbability[2], 0.01f, 0.99f, "P.death = %.3f");
+
+    ImGui::InputInt("Food count", &foodCount); 
+    ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
+
+
+
+    if (!noError) {
+        popup(errorType.c_str());
+    }
+
+#ifdef DEBUG_GUI
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+#endif
+
+    ImGui::PopItemWidth();
+
+    ImGui::End();
+    return out;
 
 
     return 0;
@@ -324,10 +370,88 @@ int Gui::init(void) {
         fprintf(stderr, "failed to initialize mouse!\n");
         return -1;
     }
-    
+   
     return 0;
 }
  
+int Gui::checkData() {
+    
+    //Control blobN
+    if (initialBlobCount <= 0){
+ 
+        errorType = "The number of blobs must be greater than 0.";
+        return -1;
+    }
+    else if (initialBlobCount > 20) {
+        errorType = "The number of blobs must not exceed 20.";
+        return -1;
+    }
+
+    //Control relative speed
+
+    if(relativeSpeed < 0){
+        errorType = "The simulation cant go back in time.";
+        return -1;
+    }
+    else if (relativeSpeed > 1) {
+        errorType = "The simulation speed must be 1 or less.";
+        return -1;
+    }
+    
+    //Control max speed
+    if(maxSpeed > 30){
+        errorType = "The maximum blob speed is capped at 30 pixels per simulation tick";
+        return -1;
+    }
+    else if (maxSpeed <= 0) {
+        errorType = "The maximun blob speed must be greater than 0;";
+        return -1;
+    }
+
+    //Control Smell Radius
+    if (smellRadius > 50) {
+        errorType = "SmellRadius cant be greater than 50 pixels.";
+        return -1;
+    }
+    else if (smellRadius <= 0) {
+        errorType = "SmellRadius must be positive.";
+        return -1;
+    }
+
+    //Control jiggle
+    if (jiggleLimit > 360) {
+        errorType = "JiggleLimit must be less than 360 degrees.";
+        return -1;
+    }
+    else if (jiggleLimit < 0) {
+        errorType = "JiggleLimit must be at least 0.";
+        return -1;
+    }
+
+    //Control P muerte
+    for (int i = 0; i < 3; i++) {
+        if (deathProbability[i] <= 0) {
+        
+            errorType = "Blobs cant have a death probability less or equal to cero.";
+            return -1;
+        }
+        else if (deathProbability[i] >= 1) {
+            errorType = "Blobs cant have a death probability greater or equal to 1.";
+            return -1;
+        }
+    }
+
+    //Control comida
+    if (foodCount > 15) {
+        errorType = "The maximum available food is 15.";
+        return -1;
+    }
+    else if (foodCount <= 0) {
+        errorType = "There must be at least 1 unit of food.";
+        return -1;
+    }
+    return 0;
+}
 
 void Gui::helpMarker(const char* desc){
 
@@ -339,6 +463,23 @@ void Gui::helpMarker(const char* desc){
         ImGui::TextUnformatted(desc);
         ImGui::PopTextWrapPos();
         ImGui::EndTooltip();
+    }
+}
+
+void Gui::popup(const char* msg){
+
+    /*if (ImGui::BeginPopup("error"))
+    {
+        std::cout << "error popup" << std::endl;
+        std::cout << msg << std::endl;
+
+        ImGui::Text(msg);
+        ImGui::EndPopup();
+    }*/
+
+    if(ImGui::BeginPopup("error")){
+        ImGui::Text(msg);
+        ImGui::EndPopup();
     }
 }
 
@@ -373,6 +514,167 @@ int Gui::configureImGui(void) {
     return 0; 
 }
 
+
+int Gui::loadBitmaps(void) {
+
+    background = al_load_bitmap("background.jpg");
+    if (!background){
+        fprintf(stderr, "Failed to load background bitmap!\n");
+        return -1;
+    }
+    
+    babyBlob = al_load_bitmap("Blobs/babyblob.png");
+    if (!babyBlob) {
+        fprintf(stderr, "Failed to create babyBlob bitmpap!\n");
+        return -1;
+    }
+    
+    goodOldBlob = al_load_bitmap("Blobs/goodoldblob.png");
+    if (!goodOldBlob) {
+        fprintf(stderr, "Failed to create goodOldBlob bitmpap!\n");
+        return -1;
+    }
+    
+    grownBlob = al_load_bitmap("Blobs/grownblob.png");
+    if (!grownBlob) {
+        fprintf(stderr, "Failed to create grownBlob bitmpap!\n");
+        return -1;
+    }
+    
+    food = al_load_bitmap("food.png");
+    if (!food) {
+        fprintf(stderr, "Failed to create food bitmap!\n");
+        return -1;
+    }
+    return 0;
+}
+
+int Gui::drawBlobs(World& sim) {
+    bool out = true;
+
+    Blob* bobElBlob= sim.getNextBlob();
+    while (bobElBlob != NULL) {
+        
+        double posX, posY, angle;
+        bobElBlob->getCoordinates(posX, posY, angle);
+
+        switch (bobElBlob->getAge()) {
+
+            //optimizar codigo
+        case BABYBLOB: al_draw_bitmap(babyBlob, posX, posY, 0);
+            if (posX > (displaySizeX - al_get_bitmap_width(babyBlob)) && posY > (displaySizeY - al_get_bitmap_height(babyBlob))) {
+
+                al_draw_bitmap_region(babyBlob, (displaySizeX - posX), (displaySizeY - posY), al_get_bitmap_width(babyBlob) - (displaySizeX - posX), al_get_bitmap_height(babyBlob) - (displaySizeY - posY), 0.0f, 250, 0);
+
+            }
+        
+        
+        case GROWNBLOB: al_draw_bitmap(grownBlob, posX, posY, 0);
+            if (posX > (displaySizeX - al_get_bitmap_width(grownBlob)) && posY > (displaySizeY - al_get_bitmap_height(grownBlob))) {
+
+
+                al_draw_bitmap_region(grownBlob, (displaySizeX - posX), (displaySizeY - posY), al_get_bitmap_width(grownBlob) - (displaySizeX - posX), al_get_bitmap_height(grownBlob) - (displaySizeY - posY), 0.0f, 250, 0);
+
+
+            }
+            else if (posX > (displaySizeX - al_get_bitmap_width(grownBlob))) {
+
+                al_draw_bitmap_region(grownBlob, (displaySizeX - posX), 0.0f, al_get_bitmap_width(grownBlob) - (displaySizeX - posX), al_get_bitmap_height(grownBlob), 0.0f, posY, 0);
+
+            }
+            else if (posY > (displaySizeY - al_get_bitmap_height(grownBlob))) {
+
+                al_draw_bitmap_region(grownBlob, 0.0f, (displaySizeY - posY), al_get_bitmap_width(grownBlob), al_get_bitmap_height(grownBlob) - (displaySizeY - posY), posX, 250, 0);
+
+            }
+            break;
+
+        case GOODOLDBLOB: al_draw_bitmap(goodOldBlob, posX, posY, 0);
+            if (posX > (displaySizeX - al_get_bitmap_width(goodOldBlob)) && posY > (displaySizeY - al_get_bitmap_height(goodOldBlob))) {
+
+                al_draw_bitmap_region(goodOldBlob, (displaySizeX - posX), (displaySizeY - posY), al_get_bitmap_width(goodOldBlob) - (displaySizeX - posX), al_get_bitmap_height(goodOldBlob) - (displaySizeY - posY), 0.0f, 250, 0);
+
+            }
+            else if (posX > (displaySizeX - al_get_bitmap_width(goodOldBlob))) {
+
+                al_draw_bitmap_region(goodOldBlob, (displaySizeX - posX), 0.0f, al_get_bitmap_width(goodOldBlob) - (displaySizeX - posX), al_get_bitmap_height(goodOldBlob), 0.0f, posY, 0);
+
+            }
+            else if (posY > (displaySizeY - al_get_bitmap_height(goodOldBlob))) {
+
+                al_draw_bitmap_region(goodOldBlob, 0.0f, (displaySizeY - posY), al_get_bitmap_width(goodOldBlob), al_get_bitmap_height(goodOldBlob) - (displaySizeY - posY), posX, 250, 0);
+
+            }
+            break;
+        }
+
+        bobElBlob = sim.getNextBlob(bobElBlob);
+    }
+    return 0;
+}
+
+int Gui::drawFood(World& sim) {
+
+    //falta
+    return 1;
+}
+
+int Gui::drawBackground(World& sim) {
+
+    al_draw_scaled_bitmap(background, 0.0f, 0.0f, al_get_bitmap_width(background), al_get_bitmap_height(background), 0, 250, displaySizeX, displaySizeY, 0);
+    return 0;
+}
+
+
+//getters
 bool Gui::getClose(void) {
     return closeWindow;
 }
+
+int Gui::getMode(void) {
+    return mode + 1;
+}
+
+int Gui::getBlobNum(void) {
+    return initialBlobCount;
+}
+
+int Gui::getFoodCount(void) {
+    return foodCount;
+}
+
+float Gui::getMaxSpeed(void) {
+    return maxSpeed;
+}
+
+float Gui::getRelativeSpeed(void) {
+    return relativeSpeed;
+}
+
+float Gui::getDead(int age){
+    enum lifespan{BABY, GROWN, GOODOLD};
+    float prob;
+    
+    switch (age){
+    case BABY:
+        prob = deathProbability[BABY];
+        break;
+    case GROWN:
+        prob = deathProbability[GROWN];
+        break;
+    case GOODOLD:
+        prob = deathProbability[GOODOLD];
+        break;
+    }
+    return prob;
+}
+
+float Gui::getSmellRadius(void) {
+    return smellRadius;
+}
+
+float Gui::getJiggle(void) {
+    return jiggleLimit;
+}
+
+
