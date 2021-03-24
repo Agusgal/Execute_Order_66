@@ -7,6 +7,8 @@ Gui::Gui() {
 
     runningInitial = true;
 
+    noError = true;
+
     display = NULL;
     queue = NULL;
     simTimer = NULL;
@@ -216,10 +218,8 @@ int Gui::initialWindow(void) {
 
     const char* items[] = { "Mode 1", "Mode 2" };
     ImGui::Combo("Mode", &mode, items, IM_ARRAYSIZE(items)); //chequear modo simulacion 
-    
-    std::cout << mode << std::endl;
 
-    ImGui::InputInt("Blob number", &initialBlobCount); 
+    ImGui::InputInt("Blob number", &initialBlobCount);
     ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
 
     ImGui::SliderFloat("Relative speed", &relativeSpeed, 0.0f, 1.0f, "speed ratio = %.3f");
@@ -238,22 +238,37 @@ int Gui::initialWindow(void) {
 
     ImGui::SliderFloat("GoodOldBlob", &deathProbability[2], 0.01f, 0.99f, "P.death = %.3f");
 
-    ImGui::InputInt("Food count", &foodCount); 
+    ImGui::InputInt("Food count", &foodCount);
     ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
 
-
-    if (ImGui::Button("Start Simulation", ImVec2(guiWindowSizeX, 50)) && checkData()) {
-        noError = false;
-        ImGui::OpenPopup("error");
+    if (ImGui::Button("Start Simulation", ImVec2(guiWindowSizeX, 50))){
+        
+        if (checkData()) {
+            noError = false;
+        }  
     }
-    else{
+    else {
         noError = true;
         //Puedo seguir al programa principal
     }
-
-    if (!noError){
+    
+    if (!noError) {
+        ImGui::OpenPopup("error");
+        popupOpen = true;
+    }
+    if (popupOpen) {
         popup(errorType.c_str());
     }
+    
+    
+    
+    
+    
+
+    //popup(errorType.c_str());
+    //if(!noError){
+     //   popup(errorType.c_str());
+    //}
 
 #ifdef DEBUG_GUI
     ImGuiIO& io = ImGui::GetIO();
@@ -322,6 +337,8 @@ int Gui::mainWindow(void) {
     ImGuiIO& io = ImGui::GetIO();
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 #endif
+
+    ImGui::PopItemWidth();
 
     ImGui::End();
     return out;
@@ -451,12 +468,19 @@ void Gui::helpMarker(const char* desc){
 
 void Gui::popup(const char* msg){
 
-    if (ImGui::BeginPopup("error"))
+    /*if (ImGui::BeginPopup("error"))
     {
+        std::cout << "error popup" << std::endl;
+        std::cout << msg << std::endl;
+
+        ImGui::Text(msg);
+        ImGui::EndPopup();
+    }*/
+
+    if(ImGui::BeginPopup("error")){
         ImGui::Text(msg);
         ImGui::EndPopup();
     }
-
 }
 
 int Gui::configureEvents(void) {

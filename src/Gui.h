@@ -70,6 +70,7 @@ private:
     
     std::string errorType;
     bool noError;
+    bool popupOpen;
     
     //ImGui
 
