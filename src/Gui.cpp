@@ -322,10 +322,7 @@ int Gui::mainWindow(void) {
 
     ImGui::SliderFloat("Relative speed", &relativeSpeed, 0.0f, 1.0f, "speed ratio = %.3f");
 
-    ImGui::SliderFloat("Max blob speed", &maxSpeed, 1, 30);
-    ImGui::SameLine(); helpMarker("contrl + click to enter value, must not exceed 50 pixels per tick");
-
-    ImGui::InputFloat("Smell Radius", &smellRadius[0]);//modifico solo el primero Todo: cambiar
+    ImGui::InputFloat("Smell Radius", &smellRadius[0]);
     ImGui::SameLine(); helpMarker("Enter values between 0 and 50");
 
     ImGui::SliderAngle("Jiggle Limit", &jiggleLimit, 0.0f, 360.0f);
@@ -588,16 +585,16 @@ int Gui::drawBlobs() {
 
             //optimizar codigo
         case BABYBLOB: al_draw_bitmap(babyBlob, posX, posY, 0);
-            if (posX > (displaySizeX - al_get_bitmap_width(babyBlob)) && posY > (displaySizeY - al_get_bitmap_height(babyBlob))) {
+            /*if (posX > (displaySizeX - al_get_bitmap_width(babyBlob)) && posY > (displaySizeY - al_get_bitmap_height(babyBlob))) {
 
                 al_draw_bitmap_region(babyBlob, (displaySizeX - posX), (displaySizeY - posY), al_get_bitmap_width(babyBlob) - (displaySizeX - posX), al_get_bitmap_height(babyBlob) - (displaySizeY - posY), 0.0f, 250, 0);
 
             }
-            break;
+            break;*/
         
         
         case GROWNBLOB: al_draw_bitmap(grownBlob, posX, posY, 0);
-            if (posX > (displaySizeX - al_get_bitmap_width(grownBlob)) && posY > (displaySizeY - al_get_bitmap_height(grownBlob))) {
+            /*if (posX > (displaySizeX - al_get_bitmap_width(grownBlob)) && posY > (displaySizeY - al_get_bitmap_height(grownBlob))) {
 
 
                 al_draw_bitmap_region(grownBlob, (displaySizeX - posX), (displaySizeY - posY), al_get_bitmap_width(grownBlob) - (displaySizeX - posX), al_get_bitmap_height(grownBlob) - (displaySizeY - posY), 0.0f, 250, 0);
@@ -614,10 +611,10 @@ int Gui::drawBlobs() {
                 al_draw_bitmap_region(grownBlob, 0.0f, (displaySizeY - posY), al_get_bitmap_width(grownBlob), al_get_bitmap_height(grownBlob) - (displaySizeY - posY), posX, 250, 0);
 
             }
-            break;
+            break;*/
 
         case GOODOLDBLOB: al_draw_bitmap(goodOldBlob, posX, posY, 0);
-            if (posX > (displaySizeX - al_get_bitmap_width(goodOldBlob)) && posY > (displaySizeY - al_get_bitmap_height(goodOldBlob))) {
+            /*if (posX > (displaySizeX - al_get_bitmap_width(goodOldBlob)) && posY > (displaySizeY - al_get_bitmap_height(goodOldBlob))) {
 
                 al_draw_bitmap_region(goodOldBlob, (displaySizeX - posX), (displaySizeY - posY), al_get_bitmap_width(goodOldBlob) - (displaySizeX - posX), al_get_bitmap_height(goodOldBlob) - (displaySizeY - posY), 0.0f, 250, 0);
 
@@ -632,7 +629,7 @@ int Gui::drawBlobs() {
                 al_draw_bitmap_region(goodOldBlob, 0.0f, (displaySizeY - posY), al_get_bitmap_width(goodOldBlob), al_get_bitmap_height(goodOldBlob) - (displaySizeY - posY), posX, 250, 0);
 
             }
-            break;
+            break;*/
         default:
             break;
         }
