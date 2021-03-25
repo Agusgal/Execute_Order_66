@@ -10,9 +10,9 @@
 
 /******************** MACROS ********************/
 // Convert degrees in radians
-#define DEG2RAD(d)      ((d)*M_PI/180)
+#define DEG2RAD(d)      ((d)*M_PI/180.0)
 // Convert radians in degrees
-#define RAD2DEG(r)      ((r)*180/M_PI)
+#define RAD2DEG(r)      ((r)*180.0/M_PI)
 
 /******************** CONSTRUCTOR ********************/
 Coordinates::Coordinates() {
@@ -62,7 +62,26 @@ Coordinates::Coordinates(double maxX, double maxY) {
 
 /******************** PUBLIC METHODS ********************/
 void Coordinates::rotateRadians(const double angleInRadians) {
-    this->rotate(RAD2DEG(angleInRadians));
+    /*if (isgreater(newAngle, 1.0)) {
+        newAngle = this->angle + (this->angle - newAngle);
+    }
+    else if (isless(newAngle, 1.0)) {
+        newAngle = this->angle - (this->angle - newAngle);
+    }*/
+
+    //double tmp = RAD2DEG(angleInRadians);
+    //if (isgreaterequal(tmp, 0.0) && isless(tmp, 90.0) 
+    //    || isgreaterequal(tmp, 180.0) && isless(tmp, 270.0))
+
+
+    this->angle = RAD2DEG(angleInRadians);
+    //this->rotate(RAD2DEG(angleInRadians));
+    /*
+#ifdef DEBUG
+    std::cout
+        << ""
+        << std::endl;
+#endif*/
     return;
 }
 void Coordinates::rotate(const double rotationAngle) {
@@ -107,15 +126,14 @@ void Coordinates::update(const double modulus) {
 //#endif
 
     if (islessequal(modulus, 0.0)) {
-        std::cout << "Modulus must be greater than 0.0" << std::endl;
         return;
     }
 
     // Fix bad angles
-    if (isless(this->angle, 0.0) || isgreaterequal(this->angle, 360.0)) {
+    /*if (isless(this->angle, 0.0) || isgreaterequal(this->angle, 360.0)) {
         std::cout << "An invalid angle has been set. Fixing..." << std::endl;
         rotate(0.0);
-    }
+    }*/
 
     /*
      * Taking into account that 0° is pointing to the North, that x increases
@@ -142,7 +160,7 @@ void Coordinates::update(const double modulus) {
      *
      */
      // 0 <= angle < 90
-    if (isless(this->angle, 90.0)) {
+    /*if (isless(this->angle, 90.0)) {
         this->position.x += modulus * sin(DEG2RAD(this->angle));
         this->position.y -= modulus * cos(DEG2RAD(this->angle));
     }
@@ -160,7 +178,10 @@ void Coordinates::update(const double modulus) {
     else if (isless(this->angle, 360.0)) {
         this->position.x -= modulus * sin(DEG2RAD(this->angle - 270));
         this->position.y -= modulus * cos(DEG2RAD(this->angle - 270));
-    }
+    }*/
+
+    this->position.x += modulus * cos(DEG2RAD(this->angle));
+    this->position.y += modulus * sin(DEG2RAD(this->angle));
 
     // Stay inside bounds
     if (isgreaterequal(this->position.x, this->maximumCoordinates.x)) {
@@ -169,6 +190,14 @@ void Coordinates::update(const double modulus) {
 
     if (isgreaterequal(this->position.y, this->maximumCoordinates.y)) {
         this->position.y -= this->maximumCoordinates.y;
+    }
+
+    if (isless(this->position.x, 0.0)) {
+        this->position.x += this->maximumCoordinates.x;
+    }
+
+    if (isless(this->position.y, 0.0)) {
+        this->position.y += this->maximumCoordinates.y;
     }
 
 

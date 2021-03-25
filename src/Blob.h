@@ -33,7 +33,7 @@ public:
     void die(void);
     /* Increment food counter and return if a new birdth should happen */
     bool eat(void);
-    void grow(const double newAngle); // This happens on merge
+    void grow(void); // This happens on merge
     void move(const double modulus);
     void sayHi(void);
 

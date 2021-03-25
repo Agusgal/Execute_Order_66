@@ -129,21 +129,10 @@ bool Blob::eat(void) {
     return newBirdth;
 }
 
-void Blob::grow(const double newAngle) {
-    if (isless(newAngle, 0.0) || isgreaterequal(newAngle, 360.0)) {
-        std::cout << "The Blob's new angle must be in range [0 ; 360.0)." 
-            << "\nRecieved: " << newAngle 
-            << std::endl;
-            return;
-    }
-    else if (this->age == GOODOLDBLOB) {
-        this->sayHi();
+void Blob::grow(void) {
+    if (this->age == GOODOLDBLOB) {
         return;
     }
-
-    double currentAngle = this->currentPosition.getAngle();
-    this->currentPosition.rotate(-currentAngle); // Set angle to 0°
-    this->currentPosition.rotate(newAngle); // Set new angle
 
     this->age++;
     this->foodCount = 0;
@@ -155,7 +144,7 @@ void Blob::move(const double modulus) {
     return;
 }
 void Blob::sayHi(void) {
-    switch (this->age)
+    /*switch (this->age)
     {
         case BABYBLOB:
             std::cout << "Baby blob: ";
@@ -170,7 +159,7 @@ void Blob::sayHi(void) {
             break;
     }
     std::cout << "Hi!" << std::endl;
-
+    */
     return;
 }
 
@@ -248,15 +237,7 @@ bool Blob::setPointingDirection(double x, double y) {
 
     this->currentPosition.getPosition(blobX, blobY);
     
-    double num = fabs(blobX - x);
-    double denom = fabs(blobY - y);
-
-    if (islessequal(denom, 0.0)) {
-        newAngle = 0;
-    }
-    else {
-        newAngle = atan2(num, denom);
-    }
+    newAngle = atan2(y - blobY, x - blobX);
 
     this->currentPosition.rotateRadians(newAngle);
     return true;

@@ -98,8 +98,8 @@ World::World(
 
     for (int i = BABYBLOB; i < NBLOBS; i++) {
         this->blobsDeathChance[i] = deathChance[i];
-        this->blobsSmellRadius[i] = smellRadius[i];
         this->blobsSize[i] = blobSizeByAge[i]; 
+        this->blobsSmellRadius[i] = smellRadius[i] + this->blobsSize[i].width; // user's smell radius + blob's size :)
     }
 
     this->blobsMaxSpeed = blobsMaximumSpeed;
@@ -239,6 +239,7 @@ bool World::worldTick(const float randomJiggleLimit) {
 }
 
 bool World::checkFood(void) {
+    bool someFood = false;
     Point_t blobPosition = { 0 };
     double blobAngle = 0;
     Point_t nearestFoodPosition = { 0 };
@@ -255,14 +256,17 @@ bool World::checkFood(void) {
         if (nearestFood != NULL) {
             currentBlob->getCoordinates(blobPosition.x, blobPosition.y, blobAngle);
             nearestFood->getPosition(nearestFoodPosition.x, nearestFoodPosition.y);
+            const Size_t* blobSize = currentBlob->getBlobSize();
 
-            if (islessequal(distance(blobPosition, nearestFoodPosition), EATING_DISTANCE)) {
+            if (islessequal(distance(blobPosition, nearestFoodPosition), blobSize->width)) {
                 eatAndReproduce(*currentBlob);
+                nearestFood->updatePosition();
             }
+            someFood = true;
         }
     }
 
-    return false;
+    return someFood;
 }
 
 bool World::blobsDeath(Blob& blob) {
@@ -273,10 +277,15 @@ bool World::blobsDeath(Blob& blob) {
         return false;
     }
 
-    if (isless(generateRandomNumber(1.0), blob.getDeadthChance())) {
-        this->blobsList->remove(node);
-        aBlobHasDied = true;
+    static unsigned int flagXD = 0;
+    if (flagXD % 97 == 0) {
+        if (isless(generateRandomNumber(1.0, 2), blob.getDeadthChance())) {
+            this->blobsList->remove(node);
+            aBlobHasDied = true;
+        }
+        flagXD = 0;
     }
+    flagXD++;
 
     return aBlobHasDied;
 }
@@ -291,7 +300,7 @@ bool World::checkMerge(const float randomJiggleLimit) {
     bool thisPairMerged = false;
 
     for (SDLL_Node * mainNode = this->blobsList->getHead();
-        mainNode != listTail;
+        mainNode != NULL && mainNode != listTail;
         mainNode = mainNode->getNextNode()) {
 
         Blob* mainBlob = mainNode->getData()->blob;
@@ -300,9 +309,12 @@ bool World::checkMerge(const float randomJiggleLimit) {
             break;
         }
 
+        SDLL_Node* secondaryNodeNext = NULL;
         for (SDLL_Node * secondaryNode = mainNode->getNextNode();
             secondaryNode != NULL;
-            secondaryNode = secondaryNode->getNextNode()) {
+            secondaryNode = secondaryNodeNext) {
+
+            secondaryNodeNext = secondaryNode->getNextNode();
 
             Blob* secondaryBlob = secondaryNode->getData()->blob;
             if (secondaryBlob == NULL) {
@@ -311,7 +323,11 @@ bool World::checkMerge(const float randomJiggleLimit) {
             }
 
             thisPairMerged = this->mergeBlobs(*mainBlob, *secondaryBlob, randomJiggleLimit);
-            if (thisPairMerged == true) { atLeastOneMerge = true; }
+            if (thisPairMerged == true) {
+                atLeastOneMerge = true; 
+                mainBlob->grow();
+                this->blobsList->remove(secondaryNode);
+            }
         }
     }
 
@@ -432,7 +448,7 @@ bool World::setSmellRadius(const int age, const float newRadius) {
         return false;
     }
 
-    this->blobsSmellRadius[age] = newRadius;
+    this->blobsSmellRadius[age] = newRadius + this->blobsSize[age].width;
     // Set smell radius to all blobs this age
     updateBlobCommons();
 
@@ -489,10 +505,10 @@ void World::setFoodCount(int food) {
 /******************** PRIVATE METHODS ********************/
 bool World::createBlob(void) {
     if (blobsList == NULL) {
-        std::cout
-            << "blobsList is NULL !!!"
-            << std::endl;
-        return false;
+std::cout
+<< "blobsList is NULL !!!"
+<< std::endl;
+return false;
     }
 
 
@@ -561,6 +577,7 @@ bool World::mergeBlobs(Blob& blob1, Blob& blob2, const double randomJiggleLimmit
 
     Point_t sbP = { 0 };    // Second Blob's Position
     double sbA = 0;         // Second Blob's Angle
+    Point_t sbS = { 0 };     // First Blob's Size stored as Point_t for distance()
 
     if (blob1.getAge() != blob2.getAge()) {
         blob1.sayHi();
@@ -572,18 +589,21 @@ bool World::mergeBlobs(Blob& blob1, Blob& blob2, const double randomJiggleLimmit
     blob2.getCoordinates(sbP.x, sbP.y, sbA);
 
     blob1.getBlobSize(fbS.x, fbS.y);
+    blob1.getBlobSize(sbS.x, sbS.y);
+
+
 
     // Blobs are one above the other or not.
-    if (! isless(distance(fbP, sbP), 2 * distance(fbP, fbS))) {
-        return false;
-    }
-
-    blob1.setPointingDirection( ( fbA 
+    if (isgreater(fbP.x + fbS.x, sbP.x) && isless(fbP.x, sbP.x + sbS.x) 
+        && isgreater(fbP.y + fbS.y, sbP.y)  && isless(fbP.y, sbP.y + sbS.y) ) {
+        blob1.setPointingDirection( ( fbA 
                                  + sbA 
                                  + generateRandomNumber(fabs(randomJiggleLimmit))
                                 ) / 3);
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
 bool World::eatAndReproduce(Blob& blob) {

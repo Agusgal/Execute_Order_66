@@ -21,10 +21,19 @@ initRandom(void) {
 
 double
 generateRandomNumber(double maximum, unsigned int originalPrecision) {
-    if (islessequal(maximum, 0.0)) {
+    /*if (islessequal(maximum, 0.0)) {
         std::cout << "randomGenerators -> generateRandomNumber: Invalid maximum value." << std::endl;
         return 0.0;
+    }*/
+    if (islessequal(maximum, 0.0)) {
+        if (isless(maximum, 0.0)) {
+            maximum = fabs(maximum);
+        }
+        else {
+            return 0.0;
+        }
     }
+
     double intPart = 0, decPart = 0, intPartMax = 0, decPartMax = 0; //Integer part (variable), decimal part (variable), integer part of maximum number, decimal part of maximum number
     unsigned long int aux1 = (unsigned long int) (maximum * ipow(10, originalPrecision)); //Convert maximum to unsigned long int without decimal separator
     aux1 -= (aux1 % ipow(10, originalPrecision)); //Substract to leave only the integer part of the maximum number
