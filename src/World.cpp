@@ -185,37 +185,6 @@ void World::destroy(void) {
 bool World::worldTick(const float randomJiggleLimit) {
     double tickSpeed = 0;
 
-    switch (this->mode) {
-        case MODE_ONE:
-        /*
-        En el modo 1 los blobs en todo momento comparten la misma velocidad. 
-        El usuario setea la velocidad con dos valores:
-         - Velocidad máxima medida en px/tick (elegida antes de que inicie la
-        simulación).
-         - Velocidad porcentual entre 0% y 100% (parámetro de simulación).
-        
-        La velocidad total es la velocidad máxima multiplicada por la 
-        velocidad porcentual.
-        */
-            tickSpeed = this->blobsMaxSpeed * this->blobsRelativeSpeed;
-            break;
-
-        case MODE_TWO:
-        /*
-        En el modo 2, cada blob tiene una velocidad máxima distinta a la de los 
-        demás. Estas se eligen aleatoriamente entre 0 y un valor máximo elegido 
-        por el usuario antes de que inicie la simulación. 
-        Todos los blobs comparten la velocidad porcentual.
-        */
-
-            tickSpeed = this->blobsRelativeSpeed;
-            break;
-
-        default:
-            std::cout << "Invalid game mode. Unable to proceed." << std::endl;
-            return false;
-            break;
-    }
     Blob* john = NULL;
 
     this->checkMerge(randomJiggleLimit);
@@ -231,6 +200,8 @@ bool World::worldTick(const float randomJiggleLimit) {
         john = current->getData()->blob;
 
         if (!blobsDeath(*john)) {
+
+            tickSpeed = this->blobsRelativeSpeed * john->getMaximumSpeed();
             john->move(tickSpeed);
         }
     }

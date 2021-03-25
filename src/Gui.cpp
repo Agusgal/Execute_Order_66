@@ -390,7 +390,9 @@ void Gui::updateData(void) {
 
 
     sim->setFoodCount(foodCount);
-    sim->setMaxSpeed(maxSpeed);
+    if (mode == 0) {
+        sim->setMaxSpeed(maxSpeed);
+    }
     sim->setRelativeSpeed(relativeSpeed);
     sim->setSmellRadius(BABYBLOB, smellRadius[BABYBLOB]);
     sim->setSmellRadius(GROWNBLOB, smellRadius[GROWNBLOB]);
@@ -423,8 +425,8 @@ int Gui::checkData() {
     }
     
     //Control max speed
-    if(isgreater(maxSpeed, 30.0)){
-        errorType = "The maximum blob speed is capped at 30 pixels per simulation tick";
+    if(isgreater(maxSpeed, 200.0)){
+        errorType = "The maximum blob speed is capped at 200 pixels per simulation tick";
         return -1;
     }
     else if (islessequal(maxSpeed, 0.0)) {
@@ -589,8 +591,8 @@ int Gui::drawBlobs() {
 
                 al_draw_bitmap_region(babyBlob, (displaySizeX - posX), (displaySizeY - posY), al_get_bitmap_width(babyBlob) - (displaySizeX - posX), al_get_bitmap_height(babyBlob) - (displaySizeY - posY), 0.0f, 250, 0);
 
-            }
-            break;*/
+            }*/
+            break;
         
         
         case GROWNBLOB: al_draw_bitmap(grownBlob, posX, posY, 0);
@@ -611,7 +613,8 @@ int Gui::drawBlobs() {
                 al_draw_bitmap_region(grownBlob, 0.0f, (displaySizeY - posY), al_get_bitmap_width(grownBlob), al_get_bitmap_height(grownBlob) - (displaySizeY - posY), posX, 250, 0);
 
             }
-            break;*/
+            */
+            break;
 
         case GOODOLDBLOB: al_draw_bitmap(goodOldBlob, posX, posY, 0);
             /*if (posX > (displaySizeX - al_get_bitmap_width(goodOldBlob)) && posY > (displaySizeY - al_get_bitmap_height(goodOldBlob))) {
@@ -628,8 +631,8 @@ int Gui::drawBlobs() {
 
                 al_draw_bitmap_region(goodOldBlob, 0.0f, (displaySizeY - posY), al_get_bitmap_width(goodOldBlob), al_get_bitmap_height(goodOldBlob) - (displaySizeY - posY), posX, 250, 0);
 
-            }
-            break;*/
+            }*/
+            break;
         default:
             break;
         }
